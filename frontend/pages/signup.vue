@@ -19,11 +19,10 @@ const signUp = async () => {
     })
 }
 
-onMounted(() => {
-  if (localStorage.getItem('token')) {
-    router.push('/')
-  }
-})
+const token = useCookie('token')
+if (token.value) {
+  router.push('/')
+}
 </script>
 
 <template>

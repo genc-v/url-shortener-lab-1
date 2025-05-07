@@ -4,17 +4,19 @@
 
 <script setup>
 const router = useRouter()
-onMounted(() => {
-  const rtoken = localStorage.getItem('rtoken')
-  api('User/Logout', 'DELETE', rtoken)
-    .then(() => {
-      localStorage.removeItem('token')
-      localStorage.removeItem('rtoken')
-      localStorage.removeItem('exp')
-      router.replace('/login')
-    })
-    .catch((error) => {
-      console.error(error)
-    })
-})
+const rtoken = useCookie('refreshToken')
+
+api('User/Logout', 'DELETE', rtoken.value)
+  .then(() => {
+    const token = useCookie('token')
+    token.value = null
+    const rToken = useCookie('refreshToken')
+    rToken.value = null
+    const exp = useCookie('exp')
+    exp.value = null
+    router.replace('/login')
+  })
+  .catch((error) => {
+    console.error(error)
+  })
 </script>

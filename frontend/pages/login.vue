@@ -16,21 +16,25 @@ const validate = (state) => {
 }
 
 const login = async () => {
+  const token = useCookie('token')
+  const refreshToken = useCookie('refreshToken')
+  const exp = useCookie('exp')
   api('User/login', 'POST', state.value, false).then((data) => {
-    localStorage.setItem('token', data.token)
-    localStorage.setItem('rtoken', data.refreshToken)
+    token.value = data.token
+    refreshToken.value = data.refreshToken
 
     const decoded = jwtDecode(data.token)
-    localStorage.setItem('exp', decoded.exp)
+    exp.value = decoded.exp
+
     router.push('/')
   })
 }
 
-onMounted(() => {
-  if (localStorage.getItem('token')) {
-    router.push('/')
-  }
-})
+const token = useCookie('token')
+
+if (token.value) {
+  router.push('/')
+}
 </script>
 
 <template>

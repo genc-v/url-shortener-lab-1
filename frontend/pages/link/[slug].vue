@@ -371,17 +371,6 @@ const updateLink = async () => {
 }
 
 const fetchLinkDetails = async () => {
-  const token = localStorage.getItem('token')
-  if (!token) {
-    toast.add({
-      title: 'Authentication required',
-      description: 'Please sign in to view this link',
-      color: 'warning',
-      icon: 'i-lucide-alert-triangle'
-    })
-    return
-  }
-
   try {
     const data = await api(`URL/${route.params.slug}`)
     link.value = data
@@ -438,7 +427,6 @@ const downloadQRCode = () => {
     return
   }
 
-  // Changed variable name from 'link' to 'downloadLink' to avoid conflict with the ref
   const downloadLink = document.createElement('a')
   downloadLink.download = `${link.value.shortUrl}-qrcode.png`
   downloadLink.href = canvas.toDataURL('image/png')
@@ -456,52 +444,37 @@ const downloadQRCode = () => {
 
 const confirmDelete = async () => {
   isDeleting.value = true
-  try {
-    const token = localStorage.getItem('token')
-    const response = await fetch(
-      `${config.value}/api/URL/${route.params.slug}`,
-      {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    )
-
-    if (!response.ok) throw new Error('Deletion failed')
-
-    toast.add({
-      title: 'URL deleted',
-      description: `${link.value.shortUrl} was removed`,
-      color: 'success',
-      icon: 'i-lucide-trash-2'
+  api('api/Url/' + route.params.slug, 'DELETE')
+    .then(() => {
+      toast.add({
+        title: 'URL deleted',
+        description: `${link.value.shortUrl} was removed`,
+        color: 'success',
+        icon: 'i-lucide-trash-2'
+      })
+      router.push('/links')
     })
-
-    router.push('/links')
-  } catch (error) {
-    console.error(error)
-    toast.add({
-      title: 'Deletion failed',
-      description: 'Could not delete the URL',
-      color: 'red',
-      icon: 'i-lucide-alert-circle'
+    .catch((error) => {
+      console.error(error)
+      toast.add({
+        title: 'Deletion failed',
+        description: 'Could not delete the URL',
+        color: 'red',
+        icon: 'i-lucide-alert-circle'
+      })
     })
-  } finally {
-    isDeleting.value = false
-    isDeleteModalOpen.value = false
-  }
+    .finally(() => {
+      isDeleting.value = false
+      isDeleteModalOpen.value = false
+    })
 }
 
 const closeDeleteModal = () => {
   isDeleteModalOpen.value = false
 }
 
-// Lifecycle
-onMounted(() => {
-  fetchLinkDetails()
-})
+fetchLinkDetails()
 
-// Watch for escape key to close modal
 watch(isDeleteModalOpen, (isOpen) => {
   const handler = (event) => {
     if (event.key === 'Escape') closeDeleteModal()
@@ -510,7 +483,6 @@ watch(isDeleteModalOpen, (isOpen) => {
   else document.removeEventListener('keydown', handler)
 })
 
-// Also watch for escape key to cancel editing
 watch(isEditing, (isEditing) => {
   const handler = (event) => {
     if (event.key === 'Escape') cancelEditing()

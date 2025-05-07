@@ -43,16 +43,6 @@ const clicksGrowth = computed(() => {
 })
 
 const fetchUrls = async () => {
-  const token = localStorage.getItem('token')
-  if (!token) {
-    toast.add({
-      title: 'Authentication required',
-      description: 'Please sign in to view your URLs',
-      color: 'warning',
-      icon: 'i-lucide-alert-triangle'
-    })
-    return
-  }
   try {
     api(`User/Urls/${page.value}/${pageSize.value}`, 'GET').then((result) => {
       data.value = result.urls
@@ -73,25 +63,24 @@ const fetchUrls = async () => {
   }
 }
 
-onMounted(() => {
-  fetchUrls()
-  if (totalPages.value < route.query.page) {
-    toast.add({
-      title: 'No URLs found',
-      description: 'You have no shortened URLs yet on page ' + page.value,
-      color: 'info',
-      icon: 'i-lucide-info'
-    })
+await fetchUrls()
 
-    page.value = 1
-    toast.add({
-      title: 'Redirecting',
-      description: 'Redirecting to page 1',
-      color: 'info',
-      icon: 'i-lucide-info'
-    })
-  }
-})
+if (totalPages.value < route.query.page) {
+  toast.add({
+    title: 'No URLs found',
+    description: 'You have no shortened URLs yet on page ' + page.value,
+    color: 'info',
+    icon: 'i-lucide-info'
+  })
+
+  page.value = 1
+  toast.add({
+    title: 'Redirecting',
+    description: 'Redirecting to page 1',
+    color: 'info',
+    icon: 'i-lucide-info'
+  })
+}
 
 watch(
   () => page.value,
@@ -471,7 +460,6 @@ watch(isDeleteModalOpen, (isOpen) => {
       </UTable>
     </div>
 
-    <!-- Pagination -->
     <div class="flex items-center justify-between mt-4">
       <USelect v-model="value" :items="items" class="w-20" />
       <UPagination

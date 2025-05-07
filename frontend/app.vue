@@ -14,18 +14,16 @@ const _config = useState('config', () => runtimeConfig.public)
 const { ui } = useUi()
 const isLoggedIn = ref('loggedIn', () => true)
 
-onMounted(() => {
-  const token = localStorage.getItem('token')
-  if (!token) {
-    isLoggedIn.value = false
-    router.push('/login')
-  }
-})
+const token = useCookie('token')
+if (!token.value) {
+  isLoggedIn.value = false
+  router.push('/login')
+}
 
 watch(route, () => {
-  const token = localStorage.getItem('token')
+  const token = useCookie('token')
 
-  if (!token) {
+  if (!token.value) {
     isLoggedIn.value = false
   } else {
     isLoggedIn.value = true
