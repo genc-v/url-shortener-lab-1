@@ -329,10 +329,8 @@ const editedData = ref({
   description: link.value.description || ''
 })
 
-// Computed
 const qrCodeValue = computed(() => `${config.value}/${link.value.shortUrl}`)
 
-// Methods
 const startEditing = () => {
   editedData.value = {
     description: link.value.description || ''
@@ -442,9 +440,10 @@ const downloadQRCode = () => {
   })
 }
 
+console.log(route.params.slug)
 const confirmDelete = async () => {
   isDeleting.value = true
-  api('api/Url/' + route.params.slug, 'DELETE')
+  api('Url/' + route.params.slug, 'DELETE')
     .then(() => {
       toast.add({
         title: 'URL deleted',
@@ -452,7 +451,7 @@ const confirmDelete = async () => {
         color: 'success',
         icon: 'i-lucide-trash-2'
       })
-      router.push('/links')
+      router.push('/link/all')
     })
     .catch((error) => {
       console.error(error)

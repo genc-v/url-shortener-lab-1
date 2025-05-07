@@ -25,6 +25,8 @@ const itemToDelete = ref(null)
 const isDeleting = ref(false)
 const items = ref([10, 20, 50, 100])
 const value = ref(items.value[0])
+const searchQuery = ref('')
+const isSearching = ref(false)
 
 // Computed properties
 const filteredData = computed(() => data.value)
@@ -98,6 +100,7 @@ watch(
 watch(
   () => value.value,
   (a) => {
+    page.value = 1
     pageSize.value = a
     fetchUrls()
   }
@@ -267,6 +270,29 @@ const columns = [
       )
   }
 ]
+const SearchUrls = async () => {
+  if (searchQuery.value) {
+    api('search?UrlName=' + searchQuery.value, 'GET')
+      .then((result) => {
+        data.value = result
+      })
+      .catch(() => {
+        data.value = []
+        toast.add({
+          title: 'Search failed',
+          description: 'No results found for "' + searchQuery.value + '"',
+          color: 'error',
+          icon: 'i-lucide-alert-circle',
+          timeout: 5000
+        })
+      })
+      .finally(() => {
+        isLoading.value = false
+      })
+  } else {
+    isSearching.value = false
+  }
+}
 
 watch(isDeleteModalOpen, (isOpen) => {
   const handler = (event) => {
@@ -275,6 +301,16 @@ watch(isDeleteModalOpen, (isOpen) => {
   if (isOpen) document.addEventListener('keydown', handler)
   else document.removeEventListener('keydown', handler)
 })
+const debouncedSearch = debounce(() => {
+  if (searchQuery.value == '') {
+    isSearching.value = false
+    fetchUrls()
+    return
+  }
+  page.value = 1
+  SearchUrls()
+}, 500)
+watch(searchQuery, debouncedSearch)
 </script>
 
 <template>
@@ -324,7 +360,7 @@ watch(isDeleteModalOpen, (isOpen) => {
     </transition>
 
     <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex flex-wrap items-center justify-between mb-6">
       <div>
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
           URL Dashboard
@@ -332,6 +368,47 @@ watch(isDeleteModalOpen, (isOpen) => {
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
           Manage and analyze your shortened URLs
         </p>
+      </div>
+      <div class="">
+        <UInput
+          v-model="searchQuery"
+          placeholder="Search URLs..."
+          icon="i-lucide-search"
+          size="lg"
+          :ui="{
+            icon: {
+              trailing: {
+                pointer: 'cursor-pointer'
+              }
+            }
+          }"
+        >
+          <template #trailing>
+            <UButton
+              v-if="searchQuery"
+              color="gray"
+              variant="link"
+              icon="i-lucide-x"
+              :padded="false"
+              @click="searchQuery = ''"
+            />
+          </template>
+        </UInput>
+
+        <div
+          v-if="isSearching"
+          class="mt-2 text-sm text-gray-500 dark:text-gray-400"
+        >
+          Showing results for: "{{ searchQuery }}"
+          <UButton
+            size="xs"
+            variant="link"
+            color="primary"
+            label="Clear search"
+            @click="searchQuery = ''"
+            class="ml-2"
+          />
+        </div>
       </div>
       <div class="flex space-x-3">
         <UButton
@@ -341,6 +418,7 @@ watch(isDeleteModalOpen, (isOpen) => {
           label="Refresh"
           :loading="isRefreshing"
           @click="fetchUrls"
+          class="cursor-pointer"
         />
         <UButton
           icon="i-lucide-plus"

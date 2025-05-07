@@ -1,6 +1,7 @@
 <template>
   <UApp>
     <Nav v-if="isLoggedIn" />
+
     <NuxtPage />
     <Footer v-if="isLoggedIn" />
   </UApp>

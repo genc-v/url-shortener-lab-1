@@ -74,6 +74,132 @@
             />
           </div>
 
+          <!-- Password Change Section -->
+          <div class="pt-4 border-t border-gray-800">
+            <h3 class="text-lg font-medium text-gray-300 mb-4">
+              Change Password
+            </h3>
+
+            <!-- Current Password -->
+            <div class="mb-4">
+              <label
+                for="currentPassword"
+                class="block text-sm font-medium text-gray-300 mb-1"
+              >
+                Current Password
+              </label>
+              <UInput
+                id="currentPassword"
+                v-model="passwordForm.currentPassword"
+                type="password"
+                placeholder="••••••••"
+                icon="i-heroicons-lock-closed-16-solid"
+                color="gray"
+                variant="outline"
+                class="w-full"
+                :disabled="loading"
+                :ui="{
+                  base: 'pl-10',
+                  color: {
+                    gray: {
+                      outline:
+                        'dark:bg-gray-950 ring-gray-700 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-500'
+                    }
+                  }
+                }"
+              />
+            </div>
+
+            <!-- New Password -->
+            <div class="mb-4">
+              <label
+                for="newPassword"
+                class="block text-sm font-medium text-gray-300 mb-1"
+              >
+                New Password
+              </label>
+              <UInput
+                id="newPassword"
+                v-model="passwordForm.newPassword"
+                type="password"
+                placeholder="••••••••"
+                icon="i-heroicons-lock-closed-16-solid"
+                color="gray"
+                variant="outline"
+                class="w-full"
+                :disabled="loading"
+                :ui="{
+                  base: 'pl-10',
+                  color: {
+                    gray: {
+                      outline:
+                        'dark:bg-gray-950 ring-gray-700 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-500'
+                    }
+                  }
+                }"
+              />
+              <p class="mt-1 text-xs text-gray-500">
+                Password must be at least 8 characters long
+              </p>
+            </div>
+
+            <!-- Confirm New Password -->
+            <div>
+              <label
+                for="confirmPassword"
+                class="block text-sm font-medium text-gray-300 mb-1"
+              >
+                Confirm New Password
+              </label>
+              <UInput
+                id="confirmPassword"
+                v-model="passwordForm.confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                icon="i-heroicons-lock-closed-16-solid"
+                color="gray"
+                variant="outline"
+                class="w-full"
+                :disabled="loading"
+                :ui="{
+                  base: 'pl-10',
+                  color: {
+                    gray: {
+                      outline:
+                        'dark:bg-gray-950 ring-gray-700 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-500'
+                    }
+                  }
+                }"
+              />
+            </div>
+
+            <!-- Change Password Button -->
+            <UButton
+              type="button"
+              @click="handlePasswordChange"
+              :disabled="loading || !passwordChanged"
+              block
+              color="primary"
+              variant="outline"
+              class="mt-4 transition-all duration-200"
+              :ui="{ rounded: 'rounded-lg', padding: { xl: 'px-6 py-3.5' } }"
+            >
+              <template #leading>
+                <UIcon
+                  v-if="!loading"
+                  name="i-heroicons-key-20-solid"
+                  class="w-5 h-5"
+                />
+                <UIcon
+                  v-else
+                  name="i-heroicons-arrow-path-20-solid"
+                  class="animate-spin w-5 h-5"
+                />
+              </template>
+              {{ loading ? 'Updating...' : 'Update Password' }}
+            </UButton>
+          </div>
+
           <!-- Submit Button -->
           <UButton
             type="submit"
@@ -100,7 +226,6 @@
           </UButton>
         </form>
 
-        <!-- Success Message -->
         <transition name="fade">
           <div
             v-if="successMessage"
@@ -109,39 +234,38 @@
             {{ successMessage }}
           </div>
         </transition>
+
+        <transition name="fade">
+          <div
+            v-if="errorMessage"
+            class="mt-6 p-3 bg-red-900/50 rounded-lg border border-red-800 text-red-100 text-center"
+          >
+            {{ errorMessage }}
+          </div>
+        </transition>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-const config = useState('config')
 const toast = useToast()
 const loading = ref(false)
 const successMessage = ref('')
+const errorMessage = ref('')
 const initialFormData = ref(null)
 
-// Form data
 const form = reactive({
   fullName: '',
   email: ''
 })
 
-// Get user ID from JWT
-const getUserIdFromToken = () => {
-  const token = localStorage.getItem('token')
-  if (!token) return null
+const passwordForm = reactive({
+  currentPassword: '',
+  newPassword: '',
+  confirmPassword: ''
+})
 
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]))
-    return payload.nameId // Adjust this based on your JWT structure
-  } catch (error) {
-    console.error('Error decoding token:', error)
-    return null
-  }
-}
-
-// Check if form has changed
 const formChanged = computed(() => {
   return (
     initialFormData.value &&
@@ -150,86 +274,96 @@ const formChanged = computed(() => {
   )
 })
 
-// Fetch user data
+const passwordChanged = computed(() => {
+  return (
+    passwordForm.currentPassword &&
+    passwordForm.newPassword &&
+    passwordForm.confirmPassword &&
+    passwordForm.newPassword === passwordForm.confirmPassword &&
+    passwordForm.newPassword.length >= 8
+  )
+})
+
 const fetchUserData = async () => {
-  const userId = getUserIdFromToken()
-  if (!userId) {
-    toast.add({
-      title: 'Authentication Error',
-      description: 'Please log in to view settings',
-      color: 'red'
-    })
-    return
-  }
-
   loading.value = true
+  const userId = useCookie('userId').value
 
-  try {
-    const response = await $fetch(`${config.value}/api/User/${userId}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
+  await api(`User/${userId}`, 'GET')
+    .then((response) => {
+      form.fullName = response.fullName
+      form.email = response.email
+      initialFormData.value = { ...response }
     })
-
-    form.fullName = response.fullName
-    form.email = response.email
-    initialFormData.value = { ...response }
-  } catch (error) {
-    toast.add({
-      title: 'Error',
-      description: 'Failed to fetch user data',
-      color: 'red'
+    .catch((error) => {
+      errorMessage.value = 'Failed to fetch user data'
+      console.error('Error fetching user data:', error)
     })
-    console.error('Error fetching user data:', error)
-  } finally {
-    loading.value = false
-  }
+    .finally(() => {
+      loading.value = false
+    })
 }
 
-// Handle form submission
 const handleSubmit = async () => {
-  const userId = getUserIdFromToken()
-  if (!userId) return
-
   loading.value = true
   successMessage.value = ''
+  errorMessage.value = ''
+  const userId = useCookie('userId').value
 
-  try {
-    const response = await $fetch(`${config.value}/api/User/${userId}`, {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        fullName: form.fullName,
-        email: form.email
-      })
+  await api(`User/${userId}`, 'PUT', {
+    fullName: form.fullName,
+    email: form.email
+  })
+    .then(() => {
+      successMessage.value = 'Profile updated successfully'
+      initialFormData.value = { ...form }
+      setTimeout(() => {
+        successMessage.value = ''
+      }, 3000)
     })
-
-    successMessage.value = 'Your changes have been saved successfully'
-    initialFormData.value = { ...form }
-
-    setTimeout(() => {
-      successMessage.value = ''
-    }, 3000)
-  } catch (error) {
-    toast.add({
-      title: 'Error',
-      description: 'Failed to update user data',
-      color: 'red'
+    .catch((error) => {
+      errorMessage.value = error.message || 'Failed to update profile'
+      setTimeout(() => {
+        errorMessage.value = ''
+      }, 3000)
     })
-    console.error('Error updating user data:', error)
-  } finally {
-    loading.value = false
-  }
+    .finally(() => {
+      loading.value = false
+    })
 }
 
-// Fetch user data on component mount
-onMounted(() => {
-  fetchUserData()
-})
+const handlePasswordChange = async () => {
+  loading.value = true
+  successMessage.value = ''
+  errorMessage.value = ''
+  const userId = useCookie('userId').value
+
+  await api('User/' + userId, 'PUT', {
+    email: null,
+    fullName: null,
+    oldPassowrd: passwordForm.confirmPassword,
+    password: passwordForm.currentPassword
+  })
+    .then(() => {
+      successMessage.value = 'Password changed successfully'
+      passwordForm.currentPassword = ''
+      passwordForm.newPassword = ''
+      passwordForm.confirmPassword = ''
+      setTimeout(() => {
+        successMessage.value = ''
+      }, 3000)
+    })
+    .catch((error) => {
+      errorMessage.value = error.message || 'Failed to change password'
+      setTimeout(() => {
+        errorMessage.value = ''
+      }, 3000)
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+fetchUserData()
 </script>
 
 <style>

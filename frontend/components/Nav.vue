@@ -30,38 +30,6 @@ const items = ref<NavigationMenuItem[]>([
   },
 
   {
-    label: 'Analytics',
-    icon: 'i-heroicons-chart-bar',
-    to: '/analytics',
-    description: 'View performance statistics',
-    children: [
-      {
-        label: 'Overview',
-        icon: 'i-heroicons-chart-pie',
-        to: '/analytics',
-        description: 'Summary of all analytics'
-      },
-      {
-        label: 'Link Analytics',
-        icon: 'i-heroicons-arrow-trending-up',
-        to: '/analytics',
-        description: 'Detailed link performance'
-      },
-      {
-        label: 'QR Code Analytics',
-        icon: 'i-heroicons-qr-code',
-        to: '/analytics',
-        description: 'QR code scan statistics'
-      },
-      {
-        label: 'Reports',
-        icon: 'i-heroicons-document-chart-bar',
-        to: '/analytics',
-        description: 'Generate custom reports'
-      }
-    ]
-  },
-  {
     label: 'Settings',
     icon: 'i-heroicons-cog-6-tooth',
     to: '/settings',

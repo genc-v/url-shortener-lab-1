@@ -1,59 +1,3 @@
-<script setup>
-const stats = ref([
-  {
-    name: 'Total Links',
-    value: '1,248',
-    change: '+12.5%',
-    changeType: 'positive'
-  },
-  {
-    name: 'Total Clicks',
-    value: '24,901',
-    change: '+8.2%',
-    changeType: 'positive'
-  },
-  { name: 'Top Link', value: 'localhost:5001/sale', clicks: '3,421' }
-])
-
-const recentLinks = ref([
-  {
-    id: 1,
-    url: 'localhost:5001/marketing',
-    destination: 'example.com/campaign',
-    clicks: 421,
-    created: '2 hours ago'
-  },
-  {
-    id: 2,
-    url: 'localhost:5001/product',
-    destination: 'example.com/new-product',
-    clicks: 198,
-    created: '5 hours ago'
-  },
-  {
-    id: 3,
-    url: 'localhost:5001/support',
-    destination: 'example.com/help-center',
-    clicks: 156,
-    created: '1 day ago'
-  }
-])
-const quickActions = [
-  { icon: 'i-heroicons-plus-circle', name: 'Create Link', to: '/links/add' },
-  {
-    icon: 'i-heroicons-qr-code',
-    name: 'Generate QR',
-    to: '/qr-codes/generator'
-  },
-
-  {
-    icon: 'i-heroicons-document-text',
-    name: 'Generate Report',
-    to: '/analytics/reports'
-  }
-]
-</script>
-
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <!-- Header -->
@@ -187,7 +131,7 @@ const quickActions = [
                 </h2>
                 <UButton
                   label="View All"
-                  to="/links/all"
+                  to="/linkF/all"
                   variant="link"
                   color="primary"
                   size="sm"
@@ -298,3 +242,59 @@ const quickActions = [
     </main>
   </div>
 </template>
+
+<script setup>
+const stats = ref([
+  {
+    name: 'Total Links',
+    value: '1,248',
+    change: '+12.5%',
+    changeType: 'positive'
+  },
+  {
+    name: 'Total Clicks',
+    value: '24,901',
+    change: '+8.2%',
+    changeType: 'positive'
+  },
+  { name: 'Top Link', value: 'localhost:5001/sale', clicks: '3,421' }
+])
+
+const recentLinks = ref([
+  {
+    id: 1,
+    url: 'localhost:5001/marketing',
+    destination: 'example.com/campaign',
+    clicks: 421,
+    created: '2 hours ago'
+  },
+  {
+    id: 2,
+    url: 'localhost:5001/product',
+    destination: 'example.com/new-product',
+    clicks: 198,
+    created: '5 hours ago'
+  },
+  {
+    id: 3,
+    url: 'localhost:5001/support',
+    destination: 'example.com/help-center',
+    clicks: 156,
+    created: '1 day ago'
+  }
+])
+const quickActions = [
+  { icon: 'i-heroicons-plus-circle', name: 'Create Link', to: '/links/add' },
+  {
+    icon: 'i-heroicons-qr-code',
+    name: 'Generate QR',
+    to: '/qr-codes/generator'
+  },
+
+  {
+    icon: 'i-heroicons-document-text',
+    name: 'Generate Report',
+    to: '/analytics/reports'
+  }
+]
+</script>

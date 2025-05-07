@@ -1,42 +1,3 @@
-<script setup>
-import { jwtDecode } from 'jwt-decode'
-
-const state = ref({
-  email: '',
-  password: ''
-})
-
-const router = useRouter()
-
-const validate = (state) => {
-  const errors = []
-  if (!state.email) errors.push({ name: 'email', message: 'Required' })
-  if (!state.password) errors.push({ name: 'password', message: 'Required' })
-  return errors
-}
-
-const login = async () => {
-  const token = useCookie('token')
-  const refreshToken = useCookie('refreshToken')
-  const exp = useCookie('exp')
-  api('User/login', 'POST', state.value, false).then((data) => {
-    token.value = data.token
-    refreshToken.value = data.refreshToken
-
-    const decoded = jwtDecode(data.token)
-    exp.value = decoded.exp
-
-    router.push('/')
-  })
-}
-
-const token = useCookie('token')
-
-if (token.value) {
-  router.push('/')
-}
-</script>
-
 <template>
   <div
     class="w-full min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4"
@@ -94,3 +55,43 @@ if (token.value) {
     </div>
   </div>
 </template>
+
+<script setup>
+import { jwtDecode } from 'jwt-decode'
+
+const state = ref({
+  email: '',
+  password: ''
+})
+
+const router = useRouter()
+
+const validate = (state) => {
+  const errors = []
+  if (!state.email) errors.push({ name: 'email', message: 'Required' })
+  if (!state.password) errors.push({ name: 'password', message: 'Required' })
+  return errors
+}
+
+const login = async () => {
+  const token = useCookie('token')
+  const refreshToken = useCookie('refreshToken')
+  const exp = useCookie('exp')
+  const userId = useCookie('userId')
+  api('User/login', 'POST', state.value, false).then((data) => {
+    token.value = data.token
+    refreshToken.value = data.refreshToken
+
+    const decoded = jwtDecode(data.token)
+    exp.value = decoded.exp
+    userId.value = decoded.nameid
+    router.push('/')
+  })
+}
+
+const token = useCookie('token')
+
+if (token.value) {
+  router.push('/')
+}
+</script>

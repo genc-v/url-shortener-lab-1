@@ -24,6 +24,7 @@ export const api = async (
       })
       return
     }
+
     const tokenExp = exp.value * 1000 < Date.now()
     if (tokenExp) {
       await fetchToken()

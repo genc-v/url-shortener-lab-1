@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <div class="min-h-screen"></div>
 </template>
 
 <script setup>
@@ -14,6 +14,8 @@ api('User/Logout', 'DELETE', rtoken.value)
     rToken.value = null
     const exp = useCookie('exp')
     exp.value = null
+    const userId = useCookie('userId')
+    userId.value = null
     router.replace('/login')
   })
   .catch((error) => {
