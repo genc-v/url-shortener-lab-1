@@ -102,5 +102,45 @@ namespace URLShortener.Service.Url
                     .ToArray()
             );
         }
+
+        public int GetTotalUrls()
+        {
+            return _context.Urls.Count();
+        }
+
+        public int GetTotalClicks()
+        {
+            return _context.Urls.Sum(url => url.NrOfClicks);
+        }
+
+        public IEnumerable<object> GetTopLinks(int count)
+        {
+            return _context.Urls
+                .OrderByDescending(url => url.NrOfClicks)
+                .Take(count)
+                .Select(url => new
+                {
+                    url.Id,
+                    url.OriginalUrl,
+                    url.ShortUrl,
+                    url.NrOfClicks
+                })
+                .ToList();
+        }
+
+        public IEnumerable<object> GetRecentLinks(int count)
+        {
+            return _context.Urls
+                .OrderByDescending(url => url.DateCreated)
+                .Take(count)
+                .Select(url => new
+                {
+                    url.Id,
+                    url.OriginalUrl,
+                    url.ShortUrl,
+                    url.DateCreated
+                })
+                .ToList();
+        }
     }
 }

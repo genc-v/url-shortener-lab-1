@@ -123,5 +123,37 @@ namespace URLShortener.Controllers
             }
         }
 
+        [HttpGet("analytics")]
+        public IActionResult GetAnalytics()
+        {
+
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var userId = Authentication.GetUserIdFromToken(token);
+            if (userId == null)
+            {
+                return BadRequest(new { message = "Bad token or you do not have premission" });
+            } 
+
+            try
+            {
+                var totalUrls = _urlService.GetTotalUrls();
+                var totalClicks = _urlService.GetTotalClicks();
+                var topLinks = _urlService.GetTopLinks(3);
+                var recentLinks = _urlService.GetRecentLinks(5);
+
+                return Ok(new
+                {
+                    TotalUrls = totalUrls,
+                    TotalClicks = totalClicks,
+                    TopLinks = topLinks,
+                    RecentLinks = recentLinks
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
     }
 }
