@@ -5,12 +5,18 @@ using System.Text;
 
 public static class TokenService
 {
+    private static string _jwtKey;
+
+    public static void Initialize(string jwtKey)
+    {
+        _jwtKey = jwtKey ?? throw new ArgumentNullException(nameof(jwtKey));
+    }
 
     public static string GenerateToken(int id, string email, string username, bool isAdmin)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         // TODO get the key from appsettings
-        var key = Encoding.ASCII.GetBytes("LIFE_FROM_GJIRAFA_242424242424242424");
+        var key = Encoding.ASCII.GetBytes(_jwtKey);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -21,7 +27,7 @@ public static class TokenService
             new Claim(ClaimTypes.Sid, username),
             new Claim("IsAdmin", isAdmin.ToString())
         }),
-            Expires = DateTime.UtcNow.AddSeconds(30),
+            Expires = DateTime.UtcNow.AddHours(3),
             Issuer = "your-issuer",
             Audience = "your-audience",
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -35,7 +41,7 @@ public static class TokenService
     public static ClaimsPrincipal VerifyToken(string token, bool ignoreExpiration = false)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes("LIFE_FROM_GJIRAFA_242424242424242424");
+        var key = Encoding.ASCII.GetBytes(_jwtKey);
 
         try
         {
