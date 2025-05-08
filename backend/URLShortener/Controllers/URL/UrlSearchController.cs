@@ -34,54 +34,49 @@ public class URLSearchController : ControllerBase
 
         var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
         int userId = Authentication.GetUserIdFromToken(token);
+        var searchQuery = UrlName.Trim().ToLower();
 
         if (string.IsNullOrEmpty(UrlName))
         {
             return BadRequest("Please type something...");
         }
 
+        IQueryable<URL> query = _context.Urls;
+
         bool admin = Authentication.IsAdminFromToken(token);
 
         if (admin)
         {
-            var resultsAdmin = _context.Urls
-                .Where(url => url.OriginalUrl.Contains(UrlName))
+            var resultsAdmin = query.Where(url => url.OriginalUrl.ToLower().Contains(searchQuery) || url.ShortUrl.ToLower().Contains(searchQuery) || url.Description.ToLower().Contains(searchQuery))
                 .ToList()
                 .Select(url => new UrlResponseDto()
                 {
                     UserId = url.UserId,
                     OriginalUrl = url.OriginalUrl,
                     ShortUrl = url.ShortUrl,
+                    DateCreated = url.DateCreated,
                     Description = url.Description
                 })
                 .ToList();
 
-            if (resultsAdmin.Any())
-            {
-                return Ok(resultsAdmin);
-            }
+            return Ok(resultsAdmin);
 
-            return NotFound("No matching Urls");
         }
 
 
-        var results = _context.Urls
-            .Where(url => url.UserId == userId && url.OriginalUrl.Contains(UrlName))
+        var results = query.Where(url => url.UserId == userId && (url.OriginalUrl.ToLower().Contains(searchQuery) || url.ShortUrl.ToLower().Contains(searchQuery) || url.Description.ToLower().Contains(searchQuery)))
             .ToList()
             .Select(url => new UrlResponseDto()
             {
                 UserId = url.UserId,
                 OriginalUrl = url.OriginalUrl,
                 ShortUrl = url.ShortUrl,
-                Description = url.Description
+                Description = url.Description,
+                DateCreated = url.DateCreated
             })
             .ToList();
 
-        if (results.Any())
-        {
-            return Ok(results);
-        }
+        return Ok(results);
 
-        return NotFound("No matching Urls");
     }
 }

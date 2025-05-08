@@ -25,7 +25,7 @@ const itemToDelete = ref(null)
 const isDeleting = ref(false)
 const items = ref([10, 20, 50, 100])
 const value = ref(items.value[0])
-const searchQuery = ref('')
+const searchQuery = ref(route.query.searchQuery || '')
 const isSearching = ref(false)
 
 // Computed properties
@@ -67,21 +67,20 @@ const fetchUrls = async () => {
 
 await fetchUrls()
 
-if (totalPages.value < route.query.page) {
+if (totalPages.value < (route.query.page || 1)) {
   toast.add({
-    title: 'No URLs found',
-    description: 'You have no shortened URLs yet on page ' + page.value,
-    color: 'info',
-    icon: 'i-lucide-info'
+    title: 'Page not found',
+    description: `The page ${route.query.page} does not exist, redireecting to pagg 1`,
+    color: 'error',
+    icon: 'i-lucide-alert-circle'
   })
-
   page.value = 1
-  toast.add({
-    title: 'Redirecting',
-    description: 'Redirecting to page 1',
-    color: 'info',
-    icon: 'i-lucide-info'
+  router.push({
+    query: {
+      page: 1
+    }
   })
+  await fetchUrls()
 }
 
 watch(
@@ -90,7 +89,6 @@ watch(
     window.scrollTo(0, 0)
     router.push({
       query: {
-        ...route.query,
         page: a
       }
     })
@@ -274,6 +272,7 @@ const SearchUrls = async () => {
   if (searchQuery.value) {
     api('search?UrlName=' + searchQuery.value, 'GET')
       .then((result) => {
+        console.log(result)
         data.value = result
       })
       .catch(() => {
@@ -301,8 +300,20 @@ watch(isDeleteModalOpen, (isOpen) => {
   if (isOpen) document.addEventListener('keydown', handler)
   else document.removeEventListener('keydown', handler)
 })
+
 const debouncedSearch = debounce(() => {
+  isSearching.value = true
+  router.push({
+    query: {
+      searchQuery: searchQuery.value
+    }
+  })
   if (searchQuery.value == '') {
+    router.push({
+      query: {
+        page: 1
+      }
+    })
     isSearching.value = false
     fetchUrls()
     return
@@ -394,21 +405,6 @@ watch(searchQuery, debouncedSearch)
             />
           </template>
         </UInput>
-
-        <div
-          v-if="isSearching"
-          class="mt-2 text-sm text-gray-500 dark:text-gray-400"
-        >
-          Showing results for: "{{ searchQuery }}"
-          <UButton
-            size="xs"
-            variant="link"
-            color="primary"
-            label="Clear search"
-            @click="searchQuery = ''"
-            class="ml-2"
-          />
-        </div>
       </div>
       <div class="flex space-x-3">
         <UButton
@@ -538,7 +534,7 @@ watch(searchQuery, debouncedSearch)
       </UTable>
     </div>
 
-    <div class="flex items-center justify-between mt-4">
+    <div v-if="!isSearching" class="flex items-center justify-between mt-4">
       <USelect v-model="value" :items="items" class="w-20" />
       <UPagination
         v-model:page="page"
