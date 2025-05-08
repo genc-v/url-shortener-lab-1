@@ -20,7 +20,7 @@ namespace URLShortener.Controllers
             _context = context;
         }
 
-        [HttpGet("{shortUrl}")]
+        [HttpGet("/api/{shortUrl}")]
         public IActionResult RedirectShortUrl(string shortUrl)
         {
 
@@ -33,7 +33,7 @@ namespace URLShortener.Controllers
                     urlMapping.NrOfClicks++;
                     _context.SaveChanges();
 
-                    return Ok(urlMapping.OriginalUrl);
+                    return Ok(new { url = urlMapping.OriginalUrl});
                 }
                 else
                 {

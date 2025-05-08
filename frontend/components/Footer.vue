@@ -57,7 +57,7 @@ const currentYear = new Date().getFullYear()
           <ul class="mt-4 space-y-2">
             <li>
               <UButton
-                to="/links/all"
+                to="/link/all"
                 variant="link"
                 color="gray"
                 label="All Links"
@@ -66,19 +66,10 @@ const currentYear = new Date().getFullYear()
             </li>
             <li>
               <UButton
-                to="/links/add"
+                to="/link/add"
                 variant="link"
                 color="gray"
                 label="Create New"
-                class="px-0"
-              />
-            </li>
-            <li>
-              <UButton
-                to="/analytics"
-                variant="link"
-                color="gray"
-                label="Analytics"
                 class="px-0"
               />
             </li>
@@ -112,13 +103,7 @@ const currentYear = new Date().getFullYear()
               />
             </li>
             <li>
-              <UButton
-                to="/blog"
-                variant="link"
-                color="gray"
-                label="Blog"
-                class="px-0"
-              />
+              <UButton variant="link" color="gray" label="Blog" class="px-0" />
             </li>
           </ul>
         </div>

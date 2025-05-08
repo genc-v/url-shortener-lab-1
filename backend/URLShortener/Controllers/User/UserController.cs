@@ -94,8 +94,8 @@ namespace URLShortener.Controllers
             var totalUrls = userUrls.Urls.Count();
             var totalPages = (int)Math.Ceiling((double)totalUrls / pageSize);
             
-            // Select only the fields you want to return
             var pagedUrls = userUrls.Urls
+                .OrderByDescending(url => url.DateCreated) 
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .Select(url => new 
@@ -190,7 +190,7 @@ namespace URLShortener.Controllers
 
         [HttpPut("{id}")]
         [Authorize]
-        public IActionResult UpdateUser(int id,[FromBody] UserUpdate userInput)
+        public IActionResult UpdateUser(int id, [FromBody] UserUpdate userInput)
         {
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             var userId = Authentication.GetUserIdFromToken(token);
@@ -203,24 +203,23 @@ namespace URLShortener.Controllers
                 {
                     return Ok(updatedUser);
                 }
-
-            } else
+            }
+            else
             {
-                if(userId == id)
+                if (userId == id)
                 {
                     var updatedUser = _userService.UpdateUser(userId, userInput);
                     if (updatedUser != null)
                     {
                         return Ok(updatedUser);
                     }
-
                 }
             }
             return NotFound($"User with ID {id} not found");
         }
 
         [HttpDelete]
-        [Authorize(AuthenticationSchemes = "allow-expired")]
+        [Authorize]
         public IActionResult DeleteUser(int id)
         {
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");

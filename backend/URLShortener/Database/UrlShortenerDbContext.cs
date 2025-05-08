@@ -14,5 +14,6 @@ namespace URLShortener.Database
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<RefreshToken> RefreshToken { get; set; }
 
+        public DbSet<Log> Logs { get; set; }
     }
 }

@@ -64,14 +64,14 @@
                   <span
                     class="font-mono text-primary-600 dark:text-primary-400"
                   >
-                    {{ config.API }}{{ link.shortUrl }}
+                    {{ siteDomain }}/{{ link.shortUrl }}
                   </span>
                   <UButton
                     icon="i-lucide-copy"
                     size="xs"
                     color="gray"
                     variant="ghost"
-                    @click="copyToClipboard(`${config.API}/${link.shortUrl}`)"
+                    @click="copyToClipboard(`${siteDomain}/${link.shortUrl}`)"
                   />
                 </div>
               </div>
@@ -153,7 +153,7 @@
             <h2 class="text-lg font-semibold">Analytics Overview</h2>
           </template>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 gap-4">
             <div class="border border-gray-500 rounded-lg p-4">
               <div class="flex items-center justify-between">
                 <div>
@@ -168,26 +168,6 @@
                   name="i-lucide-mouse-pointer-click"
                   class="w-8 h-8 text-blue-500"
                 />
-              </div>
-            </div>
-
-            <div class="border border-gray-500 rounded-lg p-4">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p
-                    class="text-sm font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    Last Click
-                  </p>
-                  <p class="text-lg font-semibold">
-                    {{
-                      link.lastClickDate
-                        ? formatDateTime(link.lastClickDate)
-                        : 'Never'
-                    }}
-                  </p>
-                </div>
-                <UIcon name="i-lucide-clock" class="w-8 h-8 text-purple-500" />
               </div>
             </div>
           </div>
@@ -243,7 +223,7 @@
               icon="i-lucide-copy"
               label="Copy Short URL"
               block
-              @click="copyToClipboard(`${config}/${link.shortUrl}`)"
+              @click="copyToClipboard(`${siteDomain}/${link.shortUrl}`)"
             />
             <UButton
               icon="i-lucide-share-2"
@@ -324,15 +304,18 @@ const isLoading = ref(true)
 const isRefreshing = ref(false)
 const isDeleteModalOpen = ref(false)
 const isDeleting = ref(false)
+const siteDomain = ref()
 const isEditing = ref(false)
 const editedData = ref({
   description: link.value.description || ''
 })
 
-// Computed
-const qrCodeValue = computed(() => `${config.value}/${link.value.shortUrl}`)
+onMounted(() => {
+  siteDomain.value = window.location.origin
+})
 
-// Methods
+const qrCodeValue = computed(() => `${siteDomain}/${link.value.shortUrl}`)
+
 const startEditing = () => {
   editedData.value = {
     description: link.value.description || ''
@@ -371,17 +354,6 @@ const updateLink = async () => {
 }
 
 const fetchLinkDetails = async () => {
-  const token = localStorage.getItem('token')
-  if (!token) {
-    toast.add({
-      title: 'Authentication required',
-      description: 'Please sign in to view this link',
-      color: 'warning',
-      icon: 'i-lucide-alert-triangle'
-    })
-    return
-  }
-
   try {
     const data = await api(`URL/${route.params.slug}`)
     link.value = data
@@ -438,7 +410,6 @@ const downloadQRCode = () => {
     return
   }
 
-  // Changed variable name from 'link' to 'downloadLink' to avoid conflict with the ref
   const downloadLink = document.createElement('a')
   downloadLink.download = `${link.value.shortUrl}-qrcode.png`
   downloadLink.href = canvas.toDataURL('image/png')
@@ -456,52 +427,37 @@ const downloadQRCode = () => {
 
 const confirmDelete = async () => {
   isDeleting.value = true
-  try {
-    const token = localStorage.getItem('token')
-    const response = await fetch(
-      `${config.value}/api/URL/${route.params.slug}`,
-      {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    )
-
-    if (!response.ok) throw new Error('Deletion failed')
-
-    toast.add({
-      title: 'URL deleted',
-      description: `${link.value.shortUrl} was removed`,
-      color: 'success',
-      icon: 'i-lucide-trash-2'
+  api('Url/' + route.params.slug, 'DELETE')
+    .then(() => {
+      toast.add({
+        title: 'URL deleted',
+        description: `${link.value.shortUrl} was removed`,
+        color: 'success',
+        icon: 'i-lucide-trash-2'
+      })
+      router.push('/link/all')
     })
-
-    router.push('/links')
-  } catch (error) {
-    console.error(error)
-    toast.add({
-      title: 'Deletion failed',
-      description: 'Could not delete the URL',
-      color: 'red',
-      icon: 'i-lucide-alert-circle'
+    .catch((error) => {
+      console.error(error)
+      toast.add({
+        title: 'Deletion failed',
+        description: 'Could not delete the URL',
+        color: 'red',
+        icon: 'i-lucide-alert-circle'
+      })
     })
-  } finally {
-    isDeleting.value = false
-    isDeleteModalOpen.value = false
-  }
+    .finally(() => {
+      isDeleting.value = false
+      isDeleteModalOpen.value = false
+    })
 }
 
 const closeDeleteModal = () => {
   isDeleteModalOpen.value = false
 }
 
-// Lifecycle
-onMounted(() => {
-  fetchLinkDetails()
-})
+fetchLinkDetails()
 
-// Watch for escape key to close modal
 watch(isDeleteModalOpen, (isOpen) => {
   const handler = (event) => {
     if (event.key === 'Escape') closeDeleteModal()
@@ -510,7 +466,6 @@ watch(isDeleteModalOpen, (isOpen) => {
   else document.removeEventListener('keydown', handler)
 })
 
-// Also watch for escape key to cancel editing
 watch(isEditing, (isEditing) => {
   const handler = (event) => {
     if (event.key === 'Escape') cancelEditing()

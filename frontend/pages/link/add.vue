@@ -50,7 +50,7 @@
               for="description"
               class="block text-sm font-medium text-gray-300 mb-1"
             >
-              Description <span class="text-gray-400">(Optional)</span>
+              Description
             </label>
             <UTextarea
               id="description"
@@ -107,7 +107,7 @@
             <p class="mb-2 text-sm text-gray-400">Your short link:</p>
             <div class="flex items-center justify-between gap-2">
               <a
-                :href="shortUrl"
+                :href="linkLocation()"
                 target="_blank"
                 rel="noopener"
                 class="text-primary-400 underline truncate"
@@ -157,41 +157,39 @@ const toast = useToast()
 const urlInput = ref(null)
 
 const handleSubmit = async () => {
-  const token = localStorage.getItem('token')
-
-  if (!token) {
-    toast.add({
-      title: 'Authentication Required',
-      description: 'Please log in to create a short link.',
-      color: 'red'
-    })
-    return
-  }
-
   loading.value = true
   shortUrl.value = ''
 
-  try {
-    api('URL', 'POST', {
-      url: link.value,
-      description: description.value
-    }).then((response) => {
+  await api('URL', 'POST', {
+    url: link.value,
+    description: description.value
+  })
+    .then((response) => {
       shortUrl.value = response.shortedUrl
-    })
 
-    toast.add({
-      title: 'Success!',
-      description: 'Your short link has been generated.',
-      color: 'green'
+      toast.add({
+        title: 'Success!',
+        description: 'Your short link has been generated.',
+        color: 'green'
+      })
+      link.value = ''
+      description.value = ''
     })
-
-    // link.value = ''
-    // description.value = ''
-  } catch (error) {
-    console.error(error)
-  } finally {
-    loading.value = false
-  }
+    .catch((error) => {
+      console.error('Error:', error)
+      toast.add({
+        title: 'Error',
+        description: 'Failed to create short link. Please try again.',
+        color: 'red'
+      })
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+const linkLocation = () => {
+  const baseUrl = window.location.origin
+  return `${baseUrl}/${shortUrl.value}`
 }
 const copyToClipboard = async () => {
   try {

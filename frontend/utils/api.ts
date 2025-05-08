@@ -13,10 +13,10 @@ export const api = async (
   }
 
   if (needsToken) {
-    const token = localStorage.getItem('token')
-    const exp: any = localStorage.getItem('exp')
+    const token = useCookie('token')
+    const exp: any = useCookie('exp')
 
-    if (!token || !exp) {
+    if (!token.value == null || !exp.value == null) {
       toast.add({
         title: 'Error fetching data',
         description: 'Token not found',
@@ -24,13 +24,14 @@ export const api = async (
       })
       return
     }
-    const tokenExp = exp * 1000 < Date.now()
+
+    const tokenExp = exp.value * 1000 < Date.now()
     if (tokenExp) {
       await fetchToken()
     }
 
-    const validToken = localStorage.getItem('token')
-    headers['Authorization'] = `Bearer ${validToken}`
+    const validToken = useCookie('token')
+    headers['Authorization'] = `Bearer ${validToken.value}`
   }
 
   const url = `${config.value.API}api/${path}`
@@ -78,10 +79,10 @@ const fetchToken = async () => {
   const config: any = useState('config')
   const toast: any = useToast()
   const url = `${config.value.API}api/User/silent-login`
-  const token = localStorage.getItem('token')
-  const rt = localStorage.getItem('rtoken')
+  const token = useCookie('token')
+  const rt = useCookie('refreshToken')
 
-  if (!token || !rt) {
+  if (!token.value || !rt.value) {
     toast.add({
       title: 'Error fetching data',
       description: 'Token not found',
@@ -96,18 +97,19 @@ const fetchToken = async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token.value}`
       },
-      body: JSON.stringify(rt)
+      body: JSON.stringify(rt.value)
     })
 
     const newToken = await response.json()
 
-    localStorage.removeItem('token')
-    localStorage.removeItem('exp')
-    localStorage.setItem('token', newToken.token)
+    const setToken = useCookie('token')
+    setToken.value = newToken.token
+
     const decoded: any = jwtDecode(newToken.token)
-    localStorage.setItem('exp', decoded.exp)
+    const exp = useCookie('exp')
+    exp.value = decoded.exp
     return
   } catch (error) {
     console.error('Fetch error:', error)

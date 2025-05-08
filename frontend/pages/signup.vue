@@ -1,31 +1,3 @@
-<script setup>
-const state = ref({
-  email: '',
-  fullName: '',
-  password: ''
-})
-
-const toast = useToast()
-const router = useRouter()
-
-const signUp = async () => {
-  await api('User/signup', 'POST', state.value, false)
-    .then(() => {
-      toast.add({ title: 'Signup Successful, Redirecting to login' })
-      router.push('/login')
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-}
-
-onMounted(() => {
-  if (localStorage.getItem('token')) {
-    router.push('/')
-  }
-})
-</script>
-
 <template>
   <div
     class="w-full min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4"
@@ -87,3 +59,30 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<script setup>
+const state = ref({
+  email: '',
+  fullName: '',
+  password: ''
+})
+
+const toast = useToast()
+const router = useRouter()
+
+const signUp = async () => {
+  await api('User/signup', 'POST', state.value, false)
+    .then(() => {
+      toast.add({ title: 'Signup Successful, Redirecting to login' })
+      router.push('/login')
+    })
+    .catch((err) => {
+      console.error(err)
+    })
+}
+
+const token = useCookie('token')
+if (token.value) {
+  router.push('/')
+}
+</script>

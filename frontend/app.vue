@@ -1,6 +1,7 @@
 <template>
   <UApp>
     <Nav v-if="isLoggedIn" />
+
     <NuxtPage />
     <Footer v-if="isLoggedIn" />
   </UApp>
@@ -14,18 +15,31 @@ const _config = useState('config', () => runtimeConfig.public)
 const { ui } = useUi()
 const isLoggedIn = ref('loggedIn', () => true)
 
-onMounted(() => {
-  const token = localStorage.getItem('token')
-  if (!token) {
-    isLoggedIn.value = false
-    router.push('/login')
-  }
-})
+const analyticsData = useState('analyticsData', () => ({
+  totalUrls: 0,
+  totalClicks: 0,
+  topLinks: [],
+  recentLinks: []
+}))
+
+await api('URL/analytics', 'GET')
+  .then((response) => {
+    analyticsData.value = response
+  })
+  .catch((error) => {
+    console.error('Error fetching analytics data:', error)
+  })
+
+const token = useCookie('token')
+if (!token.value) {
+  isLoggedIn.value = false
+  router.push('/login')
+}
 
 watch(route, () => {
-  const token = localStorage.getItem('token')
+  const token = useCookie('token')
 
-  if (!token) {
+  if (!token.value) {
     isLoggedIn.value = false
   } else {
     isLoggedIn.value = true
