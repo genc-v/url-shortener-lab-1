@@ -132,14 +132,14 @@ namespace URLShortener.Controllers
             if (userId == null)
             {
                 return BadRequest(new { message = "Bad token or you do not have premission" });
-            } 
+            }
 
             try
             {
                 var totalUrls = _urlService.GetTotalUrls();
                 var totalClicks = _urlService.GetTotalClicks();
-                var topLinks = _urlService.GetTopLinks(3);
-                var recentLinks = _urlService.GetRecentLinks(5);
+                var topLinks = _urlService.GetTopLinks(5);
+                var recentLinks = _urlService.GetRecentLinks(8);
 
                 return Ok(new
                 {

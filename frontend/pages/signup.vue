@@ -77,7 +77,7 @@ const signUp = async () => {
       router.push('/login')
     })
     .catch((err) => {
-      console.log(err)
+      console.error(err)
     })
 }
 

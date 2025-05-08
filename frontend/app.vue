@@ -15,6 +15,21 @@ const _config = useState('config', () => runtimeConfig.public)
 const { ui } = useUi()
 const isLoggedIn = ref('loggedIn', () => true)
 
+const analyticsData = useState('analyticsData', () => ({
+  totalUrls: 0,
+  totalClicks: 0,
+  topLinks: [],
+  recentLinks: []
+}))
+
+await api('URL/analytics', 'GET')
+  .then((response) => {
+    analyticsData.value = response
+  })
+  .catch((error) => {
+    console.error('Error fetching analytics data:', error)
+  })
+
 const token = useCookie('token')
 if (!token.value) {
   isLoggedIn.value = false

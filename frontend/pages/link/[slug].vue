@@ -64,14 +64,14 @@
                   <span
                     class="font-mono text-primary-600 dark:text-primary-400"
                   >
-                    {{ config.API }}{{ link.shortUrl }}
+                    {{ siteDomain }}/{{ link.shortUrl }}
                   </span>
                   <UButton
                     icon="i-lucide-copy"
                     size="xs"
                     color="gray"
                     variant="ghost"
-                    @click="copyToClipboard(`${config.API}/${link.shortUrl}`)"
+                    @click="copyToClipboard(`${siteDomain}/${link.shortUrl}`)"
                   />
                 </div>
               </div>
@@ -153,7 +153,7 @@
             <h2 class="text-lg font-semibold">Analytics Overview</h2>
           </template>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 gap-4">
             <div class="border border-gray-500 rounded-lg p-4">
               <div class="flex items-center justify-between">
                 <div>
@@ -168,26 +168,6 @@
                   name="i-lucide-mouse-pointer-click"
                   class="w-8 h-8 text-blue-500"
                 />
-              </div>
-            </div>
-
-            <div class="border border-gray-500 rounded-lg p-4">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p
-                    class="text-sm font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    Last Click
-                  </p>
-                  <p class="text-lg font-semibold">
-                    {{
-                      link.lastClickDate
-                        ? formatDateTime(link.lastClickDate)
-                        : 'Never'
-                    }}
-                  </p>
-                </div>
-                <UIcon name="i-lucide-clock" class="w-8 h-8 text-purple-500" />
               </div>
             </div>
           </div>
@@ -243,7 +223,7 @@
               icon="i-lucide-copy"
               label="Copy Short URL"
               block
-              @click="copyToClipboard(`${config}/${link.shortUrl}`)"
+              @click="copyToClipboard(`${siteDomain}/${link.shortUrl}`)"
             />
             <UButton
               icon="i-lucide-share-2"
@@ -324,12 +304,17 @@ const isLoading = ref(true)
 const isRefreshing = ref(false)
 const isDeleteModalOpen = ref(false)
 const isDeleting = ref(false)
+const siteDomain = ref()
 const isEditing = ref(false)
 const editedData = ref({
   description: link.value.description || ''
 })
 
-const qrCodeValue = computed(() => `${config.value}/${link.value.shortUrl}`)
+onMounted(() => {
+  siteDomain.value = window.location.origin
+})
+
+const qrCodeValue = computed(() => `${siteDomain}/${link.value.shortUrl}`)
 
 const startEditing = () => {
   editedData.value = {
@@ -440,7 +425,6 @@ const downloadQRCode = () => {
   })
 }
 
-console.log(route.params.slug)
 const confirmDelete = async () => {
   isDeleting.value = true
   api('Url/' + route.params.slug, 'DELETE')
