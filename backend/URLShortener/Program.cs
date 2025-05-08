@@ -92,6 +92,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 
+TokenService.Initialize(builder.Configuration["Jwt:Key"]);
+
 // Run database migrations during startup
 using (var scope = app.Services.CreateScope())
 {

@@ -7,8 +7,8 @@
             public string ShortUrl { get; set; }
             public int NrOfClicks { get; set; }
             public int? UserId { get; set; }
-           public DateTime DateCreated { get; set; }
-           public string Description { get; set; }  
+            public string Description { get; set; }
+            public DateTime? DateCreated { get; set; }  
         }
   
 }
