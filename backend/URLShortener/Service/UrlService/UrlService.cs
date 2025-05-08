@@ -6,7 +6,6 @@ using URLShortener.Controllers;
 
 namespace URLShortener.Service.Url
 {
-
     public class UrlService : IUrlService
     {
         private readonly UrlShortenerDbContext _context;
@@ -18,7 +17,6 @@ namespace URLShortener.Service.Url
 
         public IEnumerable<UrlResponseDto> GetAllUrls()
         {
-
             return _context.Urls
                 .Select(url => new UrlResponseDto()
                 {
@@ -32,13 +30,12 @@ namespace URLShortener.Service.Url
             .ToList();
         }
 
-
         public URL GetById(int id, int userId, bool isAdmin)
         {
             if(isAdmin) {
-                return _context.Urls.FirstOrDefault(url => url.Id == id );
+                return _context.Urls.FirstOrDefault(url => url.Id == id);
             }
-            return _context.Urls.FirstOrDefault(url => url.Id == id &&  url.UserId == userId);
+            return _context.Urls.FirstOrDefault(url => url.Id == id && url.UserId == userId);
         }
 
         public string ShortenUrl(string originalUrl, string token, string description)
@@ -73,7 +70,7 @@ namespace URLShortener.Service.Url
 
         public void DeleteUrl(int id, int userId)
         {
-            var urlToDelete = _context.Urls.FirstOrDefault(url => url.Id == id && url.UserId == userId) ;
+            var urlToDelete = _context.Urls.FirstOrDefault(url => url.Id == id && url.UserId == userId);
             if (urlToDelete != null)
             {
                 _context.Urls.Remove(urlToDelete);
@@ -102,20 +99,23 @@ namespace URLShortener.Service.Url
                     .ToArray()
             );
         }
-
-        public int GetTotalUrls()
+        
+        public int GetTotalUrls(int userId)
         {
-            return _context.Urls.Count();
+            return _context.Urls.Count(url => url.UserId == userId);
         }
 
-        public int GetTotalClicks()
-        {
-            return _context.Urls.Sum(url => url.NrOfClicks);
-        }
-
-        public IEnumerable<object> GetTopLinks(int count)
+        public int GetTotalClicks(int userId)
         {
             return _context.Urls
+                .Where(url => url.UserId == userId)
+                .Sum(url => url.NrOfClicks);
+        }
+
+        public IEnumerable<object> GetTopLinks(int count, int userId)
+        {
+            return _context.Urls
+                .Where(url => url.UserId == userId)
                 .OrderByDescending(url => url.NrOfClicks)
                 .Take(count)
                 .Select(url => new
@@ -128,9 +128,10 @@ namespace URLShortener.Service.Url
                 .ToList();
         }
 
-        public IEnumerable<object> GetRecentLinks(int count)
+        public IEnumerable<object> GetRecentLinks(int count, int userId)
         {
             return _context.Urls
+                .Where(url => url.UserId == userId)
                 .OrderByDescending(url => url.DateCreated)
                 .Take(count)
                 .Select(url => new

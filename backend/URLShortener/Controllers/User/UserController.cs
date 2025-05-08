@@ -226,8 +226,6 @@ namespace URLShortener.Controllers
             var userId = Authentication.GetUserIdFromToken(token);
             var isAdmin = Authentication.IsAdminFromToken(token);
 
-
-
             if (userId == null)
             {
                 return BadRequest("Token not found");
@@ -241,7 +239,7 @@ namespace URLShortener.Controllers
             }
             else if (isAdmin)
             {
-                _userService.DeleteUser(userId);
+                _userService.DeleteUser(id);
                 return Ok($"User with ID {id} deleted successfully");
             }
             return BadRequest($"User with ID {id} could not be found.");

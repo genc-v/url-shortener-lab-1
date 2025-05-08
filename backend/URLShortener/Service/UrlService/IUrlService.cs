@@ -10,10 +10,10 @@ namespace URLShortener.Service.Url
         string ShortenUrl(string originalUrl, string tokens, string description);
         void DeleteUrl(int id, int userId);
         void UpdateUrl(int id, string description, int userId);
-        int GetTotalUrls();
-        int GetTotalClicks();
-        IEnumerable<object> GetTopLinks(int count);
-        IEnumerable<object> GetRecentLinks(int count);
+        int GetTotalUrls(int userId);
+        int GetTotalClicks(int userId);
+        IEnumerable<object> GetTopLinks(int count, int userId);
+        IEnumerable<object> GetRecentLinks(int count, int userId);
     }
 
 }
