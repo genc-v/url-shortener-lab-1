@@ -16,6 +16,8 @@ api('User/Logout', 'DELETE', rtoken.value)
     exp.value = null
     const userId = useCookie('userId')
     userId.value = null
+    const isAdmin = useCookie('isAdmin')
+    isAdmin.value = null
     router.replace('/login')
   })
   .catch((error) => {

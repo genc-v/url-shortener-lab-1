@@ -80,9 +80,4 @@ const signUp = async () => {
       console.error(err)
     })
 }
-
-const token = useCookie('token')
-if (token.value) {
-  router.push('/')
-}
 </script>

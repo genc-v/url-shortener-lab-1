@@ -124,6 +124,7 @@ namespace URLShortener.Controllers
         }
 
         [HttpGet("analytics")]
+        [Authorize]
         public IActionResult GetAnalytics()
         {
 
@@ -136,10 +137,10 @@ namespace URLShortener.Controllers
 
             try
             {
-                var totalUrls = _urlService.GetTotalUrls();
-                var totalClicks = _urlService.GetTotalClicks();
-                var topLinks = _urlService.GetTopLinks(5);
-                var recentLinks = _urlService.GetRecentLinks(8);
+                var totalUrls = _urlService.GetTotalUrls(userId);
+                var totalClicks = _urlService.GetTotalClicks(userId);
+                var topLinks = _urlService.GetTopLinks(5, userId);
+                var recentLinks = _urlService.GetRecentLinks(8, userId);
 
                 return Ok(new
                 {

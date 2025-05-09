@@ -78,6 +78,7 @@ const login = async () => {
   const refreshToken = useCookie('refreshToken')
   const exp = useCookie('exp')
   const userId = useCookie('userId')
+  const isAdmin = useCookie('isAdmin')
   api('User/login', 'POST', state.value, false).then((data) => {
     token.value = data.token
     refreshToken.value = data.refreshToken
@@ -85,6 +86,7 @@ const login = async () => {
     const decoded = jwtDecode(data.token)
     exp.value = decoded.exp
     userId.value = decoded.nameid
+    isAdmin.value = decoded.IsAdmin
     router.push('/')
   })
 }
