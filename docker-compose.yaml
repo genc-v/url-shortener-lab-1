@@ -1,6 +1,6 @@
 services:
   backend:
-    build: ./BackEnd
+    build: ./backend
     ports:
       - "5001:80"
     environment:
