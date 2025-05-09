@@ -15,6 +15,7 @@ const _config = useState('config', () => runtimeConfig.public)
 const { ui } = useUi()
 const isLoggedIn = ref('loggedIn', () => true)
 
+//
 const analyticsData = useState('analyticsData', () => ({
   totalUrls: 0,
   totalClicks: 0,
