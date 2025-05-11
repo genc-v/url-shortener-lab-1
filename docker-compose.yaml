@@ -3,8 +3,6 @@ services:
     build: ./backend
     ports:
       - "5001:80"
-    environment:
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=urlshort;Username=urlshort;Password=alskjdfa@alskdjfAAAb12
     depends_on:
       db:
         condition: service_healthy
