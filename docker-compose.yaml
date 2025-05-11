@@ -14,8 +14,6 @@ services:
     build: ./frontend
     ports:
       - "3000:3000"
-    environment:
-      - API=${API}
     depends_on:
       - backend
     restart: always
