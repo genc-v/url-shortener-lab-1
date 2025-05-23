@@ -1,6 +1,6 @@
 <template>
   <!-- Stats Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+  <div class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-4 mb-5">
     <UCard>
       <div class="flex items-center justify-between">
         <div>
@@ -52,7 +52,25 @@
   </div>
 </template>
 <script setup>
-const analyticsData = useState('analyticsData')
+const analyticsData = ref()
+
+const data = []
+
+await api('URL/analytics', 'GET')
+  .then((response) => {
+    analyticsData.value = response
+  })
+  .catch((error) => {
+    console.error('Error fetching analytics data:', error)
+  })
+
+analyticsData.value.recentLinks.forEach((link) => {
+  data.push({
+    Url: link.originalUrl,
+    ShortUrl: link.shortUrl,
+    Date: timeAgo(link.dateCreated)
+  })
+})
 
 const totalClicks = analyticsData.value.totalClicks
 

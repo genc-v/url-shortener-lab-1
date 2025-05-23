@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
 
+const isAdmin = useCookie('isAdmin')
+
 const items = ref<NavigationMenuItem[]>([
   {
     label: 'Home',
     icon: 'i-heroicons-home',
-    to: '/',
+    to: '/dashboard',
     description: 'Return to the dashboard overview'
   },
   {
     label: 'Links',
     icon: 'i-heroicons-link',
-    to: '/link/all',
     description: 'Manage your shortened links',
     children: [
       {
@@ -28,18 +29,40 @@ const items = ref<NavigationMenuItem[]>([
       }
     ]
   },
-
   {
     label: 'Settings',
     icon: 'i-heroicons-cog-6-tooth',
-    to: '/settings',
-    description: 'Configure your account and preferences'
-  },
-  {
-    label: 'Logout',
-    icon: 'i-heroicons-arrow-left-on-rectangle',
-    to: '/logout',
-    description: 'Sign out of your account'
+    description: 'Configure your account and preferences',
+    children: [
+      {
+        label: 'Account Settings',
+        icon: 'i-heroicons-user-circle',
+        to: '/settings',
+        description: 'Manage your account preferences'
+      },
+      ...(isAdmin.value
+        ? [
+            {
+              label: 'User Management',
+              icon: 'i-heroicons-users',
+              to: '/users',
+              description: 'Manage system users'
+            },
+            {
+              label: 'System Logs',
+              icon: 'i-heroicons-clipboard-document-list',
+              to: '/logs',
+              description: 'View system activity logs'
+            }
+          ]
+        : []),
+      {
+        label: 'Logout',
+        icon: 'i-heroicons-arrow-left-on-rectangle',
+        to: '/logout',
+        description: 'Sign out of your account'
+      }
+    ]
   }
 ])
 </script>

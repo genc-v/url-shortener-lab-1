@@ -1,8 +1,7 @@
 <template>
   <div class="flex flex-col h-full max-w-[1440px] p-5 mx-auto">
-    <h1 class="text-center">Users</h1>
+    <h1 class="text-center text-2xl font-bold my-5">Users</h1>
 
-    <!-- Delete Modal -->
     <transition name="fade" mode="out-in">
       <div
         v-if="isDeleteModalOpen"
@@ -64,29 +63,35 @@
             Edit User
           </h2>
           <form @submit.prevent="submitEdit">
-            <div class="space-y-4">
+            <div class="space-y-4 grid cols-3">
               <UFormGroup label="Name" name="name">
+                <p>Name</p>
                 <UInput
                   v-model="editForm.name"
                   placeholder="Enter user name"
                   required
+                  class="w-full"
                 />
               </UFormGroup>
 
               <UFormGroup label="Email" name="email">
+                <p>Email</p>
                 <UInput
                   v-model="editForm.email"
                   type="email"
                   placeholder="Enter email"
+                  class="w-full"
                   required
                 />
               </UFormGroup>
 
               <UFormGroup label="Password" name="password">
+                <p>Password</p>
                 <UInput
                   v-model="editForm.password"
                   type="password"
                   placeholder="Leave blank to keep current"
+                  class="w-full"
                 />
               </UFormGroup>
             </div>
@@ -171,17 +176,14 @@ const UTable = resolveComponent('UTable')
 const UFormGroup = resolveComponent('UFormGroup')
 const UInput = resolveComponent('UInput')
 
-// Composables
 const toast = useToast()
 
-// State
 const data = ref([])
 const isLoading = ref(true)
 const isDeleteModalOpen = ref(false)
 const itemToDelete = ref(null)
 const isDeleting = ref(false)
 
-// Edit Modal State
 const isEditModalOpen = ref(false)
 const isEditing = ref(false)
 const editForm = ref({
@@ -191,17 +193,22 @@ const editForm = ref({
   password: ''
 })
 
-// Fetch users
 const fetchUsers = async () => {
   try {
+    const userId = useCookie('userId')
     isLoading.value = true
     const response = await api('User', 'GET')
-    data.value = response.map((user) => ({
-      id: user.id,
-      email: user.email,
-      name: user.fullName,
-      createdAt: user.createdAt // Assuming this field exists
-    }))
+
+    const filteredUsers = response
+      .filter((u) => u.id !== parseInt(userId.value))
+      .map((user) => ({
+        id: user.id,
+        email: user.email,
+        name: user.fullName,
+        createdAt: user.createdAt
+      }))
+
+    data.value = filteredUsers
   } catch (error) {
     console.error('User fetch failed:', error)
     toast.add({
@@ -215,7 +222,6 @@ const fetchUsers = async () => {
     isLoading.value = false
   }
 }
-
 await fetchUsers()
 
 const formatDateTime = (dateString) => {
@@ -230,7 +236,6 @@ const formatDateTime = (dateString) => {
   })
 }
 
-// Delete functionality
 const confirmDelete = async () => {
   if (!itemToDelete.value) return
 
@@ -258,7 +263,6 @@ const closeDeleteModal = () => {
   itemToDelete.value = null
 }
 
-// Edit functionality
 const openEditModal = (user) => {
   editForm.value = {
     id: user.id,
@@ -272,7 +276,7 @@ const openEditModal = (user) => {
 const closeEditModal = () => {
   isEditModalOpen.value = false
   editForm.value = {
-    id: user.id,
+    id: null,
     name: '',
     email: '',
     password: ''
@@ -287,15 +291,14 @@ const submitEdit = async () => {
     const payload = {
       email: editForm.value.email,
       fullName: editForm.value.name,
-      oldPassword: null,
-      newPassword: null
+      newPassword: editForm.value.password
     }
 
     if (editForm.value.password) {
       payload.password = editForm.value.password
     }
 
-    await api('User/' + userId, 'PUT', payload)
+    await api('User/' + editForm.value.id, 'PUT', payload)
     toast.add({
       title: 'User updated',
       description: 'User details were successfully updated',
@@ -316,11 +319,10 @@ const submitEdit = async () => {
   }
 }
 
-// Table configuration
 const columns = [
   {
     accessorKey: 'id',
-    header: 'ID',
+    header: 'Id',
     cell: ({ row }) => `#${row.getValue('id')}`,
     meta: { width: '80px', align: 'center' }
   },
@@ -389,7 +391,6 @@ const columns = [
   }
 ]
 
-// Watch for escape key to close modals
 watch([isDeleteModalOpen, isEditModalOpen], ([deleteOpen, editOpen]) => {
   const handler = (event) => {
     if (event.key === 'Escape') {
@@ -403,5 +404,8 @@ watch([isDeleteModalOpen, isEditModalOpen], ([deleteOpen, editOpen]) => {
   } else {
     document.removeEventListener('keydown', handler)
   }
+})
+useHead({
+  title: 'Manage Users'
 })
 </script>

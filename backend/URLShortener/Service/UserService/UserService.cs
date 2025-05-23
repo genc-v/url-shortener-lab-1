@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
+using System.Text.RegularExpressions;
 using URLShortener.Database;
 using URLShortener.DTOs;
 using URLShortener.DTOs.User;
@@ -386,7 +388,7 @@ namespace URLShortener.Service.User
             }
         }
 
-        public UserUpdate? UpdateUser(int id, UserUpdate userInput)
+        public UserUpdate? UpdateUser(int id, UserUpdate userInput, bool isAdmin)
         {
             try
             {
@@ -407,37 +409,22 @@ namespace URLShortener.Service.User
                     return null;
                 }
 
-                if (!string.IsNullOrEmpty(userInput.Password))
+                if (!string.IsNullOrEmpty(userInput.newPassword))
                 {
-                    bool isPasswordValid = BCrypt.Net.BCrypt.Verify(userInput.Password, userToUpdate.PasswordHash);
-                    if (!isPasswordValid)
+                    var passwordErrors = ValidatePassword(userInput.newPassword);
+                    if (passwordErrors.Count > 0)
                     {
                         _context.Logs.Add(new Log
                         {
-                            Note = $"Failed password verification for user ID: {userToUpdate.Id}",
+                            Note = $"Invalid new password format for user ID: {id}",
                             CreatedAt = DateTime.UtcNow
                         });
                         _context.SaveChanges();
                         return null;
                     }
-                }
 
-                if (userInput.Email != null)
-                {
-                    userToUpdate.Email = userInput.Email;
-                }
-
-                if (userInput.FullName != null)
-                {
-                    userToUpdate.FullName = userInput.FullName;
-                }
-
-                // Handle password change if new password is provided
-                if (!string.IsNullOrEmpty(userInput.oldPassword))
-                {
-                    if (string.IsNullOrEmpty(userInput.Password))
+                    if (!isAdmin && string.IsNullOrEmpty(userInput.oldPassword))
                     {
-                        // Require old password to set new password
                         _context.Logs.Add(new Log
                         {
                             Note = $"Attempted password change without old password for user ID: {id}",
@@ -446,7 +433,43 @@ namespace URLShortener.Service.User
                         _context.SaveChanges();
                         return null;
                     }
-                    userToUpdate.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userInput.oldPassword);
+
+                    if (!isAdmin)
+                    {
+                        bool isPasswordValid = BCrypt.Net.BCrypt.Verify(userInput.oldPassword, userToUpdate.PasswordHash);
+                        if (!isPasswordValid)
+                        {
+                            _context.Logs.Add(new Log
+                            {
+                                Note = $"Failed password verification for user ID: {userToUpdate.Id}",
+                                CreatedAt = DateTime.UtcNow
+                            });
+                            _context.SaveChanges();
+                            return null;
+                        }
+                    }
+
+                    userToUpdate.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userInput.newPassword);
+                }
+
+                if (userInput.Email != null)
+                {
+                    if (!new EmailAddressAttribute().IsValid(userInput.Email))
+                    {
+                        _context.Logs.Add(new Log
+                        {
+                            Note = $"Invalid email format for user ID: {id}",
+                            CreatedAt = DateTime.UtcNow
+                        });
+                        _context.SaveChanges();
+                        return null;
+                    }
+                    userToUpdate.Email = userInput.Email;
+                }
+
+                if (userInput.FullName != null)
+                {
+                    userToUpdate.FullName = userInput.FullName;
                 }
 
                 _context.Logs.Add(new Log
@@ -472,6 +495,24 @@ namespace URLShortener.Service.User
                 _context.SaveChanges();
                 throw;
             }
+        }
+
+        private List<string> ValidatePassword(string password)
+        {
+            var errors = new List<string>();
+
+            if (password.Length < 8)
+                errors.Add("At least 8 characters");
+            if (!Regex.IsMatch(password, "[A-Z]"))
+                errors.Add("At least one uppercase letter (A-Z)");
+            if (!Regex.IsMatch(password, "[a-z]"))
+                errors.Add("At least one lowercase letter (a-z)");
+            if (!Regex.IsMatch(password, "[0-9]"))
+                errors.Add("At least one number (0-9)");
+            if (!Regex.IsMatch(password, "[!@#$%^&*]"))
+                errors.Add("At least one special character (!@#$%^&*)");
+
+            return errors;
         }
         public void DeleteUser(int id)
         {
