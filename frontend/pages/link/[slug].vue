@@ -305,9 +305,7 @@ onMounted(() => {
   siteDomain.value = window.location.origin
 })
 
-const qrCodeValue = computed(
-  () => `${window.location.origin}/${link.value.shortUrl}`
-)
+const qrCodeValue = computed(() => `${siteDomain.value}/${link.value.shortUrl}`)
 
 const startEditing = () => {
   editedData.value = {
@@ -466,8 +464,7 @@ watch(isEditing, (isEditing) => {
   if (isEditing) document.addEventListener('keydown', handler)
   else document.removeEventListener('keydown', handler)
 })
-console.log(link.value)
 useHead({
-  title: link.value.shortUrl
+  title: 'Editing ' + link?.value?.shortUrl || 'Edit'
 })
 </script>

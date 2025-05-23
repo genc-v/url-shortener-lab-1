@@ -7,6 +7,7 @@ export default defineNuxtConfig({
       API: process.env.API
     }
   },
+
   modules: ['@nuxt/ui', '@nuxtjs/google-fonts'],
 
   css: ['~/assets/css/main.css'],
