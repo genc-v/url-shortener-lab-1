@@ -13,13 +13,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cleanup previous deployment
+      - name: Stop and clean up containers
         run: |
-          docker compose -p url-shortener down --volumes --remove-orphans --rmi all
+          docker compose -p url-shortener down --remove-orphan
           docker network prune -f
 
       - name: Pull latest images
         run: docker compose -p url-shortener pull
 
-      - name: Build and start containers
+      - name: Rebuild and restart containers
         run: docker compose -p url-shortener up -d --build --remove-orphans
