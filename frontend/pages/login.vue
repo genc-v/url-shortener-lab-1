@@ -108,4 +108,7 @@ const token = useCookie('token')
 if (token.value) {
   router.push('/dashboard')
 }
+useHead({
+  title: 'Login'
+})
 </script>

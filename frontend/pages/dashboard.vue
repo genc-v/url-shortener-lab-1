@@ -125,6 +125,9 @@ analyticsData.value.recentLinks.forEach((link) => {
 })
 const recentLinks = computed(() => data || [])
 const topLinks = computed(() => analyticsData.value?.topLinks || [])
+useHead({
+  title: 'Dashbaord'
+})
 </script>
 
 <style scoped>

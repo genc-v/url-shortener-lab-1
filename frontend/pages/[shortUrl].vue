@@ -14,4 +14,7 @@ await api(route.params.shortUrl, 'GET', {}, false)
     router.push('/')
     console.error('Error:', err)
   })
+useHead({
+  title: route.params.shortUrl
+})
 </script>

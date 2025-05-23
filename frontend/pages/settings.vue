@@ -448,6 +448,9 @@ const passwordIsValid = computed(() => {
 })
 
 fetchUserData()
+useHead({
+  title: 'Settings'
+})
 </script>
 
 <style>

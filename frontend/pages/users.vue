@@ -405,4 +405,7 @@ watch([isDeleteModalOpen, isEditModalOpen], ([deleteOpen, editOpen]) => {
     document.removeEventListener('keydown', handler)
   }
 })
+useHead({
+  title: 'Manage Users'
+})
 </script>

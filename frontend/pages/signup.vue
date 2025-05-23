@@ -173,4 +173,7 @@ const signUp = async () => {
       })
     })
 }
+useHead({
+  title: 'Signup'
+})
 </script>

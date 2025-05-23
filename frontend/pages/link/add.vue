@@ -212,6 +212,9 @@ const copyToClipboard = async () => {
     })
   }
 }
+useHead({
+  title: 'Shorten a url'
+})
 </script>
 
 <style>

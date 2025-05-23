@@ -45,20 +45,25 @@
     </transition>
 
     <!-- Header -->
-    <div class="flex flex-wrap items-center justify-between mb-6">
+    <div class="grid w-full md:grid-cols-3 gap-5 mb-6">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1
+          class="text-2xl text-center md:text-left font-bold text-gray-900 dark:text-white"
+        >
           URL Dashboard
         </h1>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <p
+          class="text-sm text-center md:text-left text-gray-500 dark:text-gray-400 mt-1"
+        >
           Manage and analyze your shortened URLs
         </p>
       </div>
-      <div class="">
+      <div class="w-full self-center">
         <UInput
           v-model="searchQuery"
           placeholder="Search URLs..."
           icon="i-lucide-search"
+          class="w-full"
           size="lg"
           :ui="{
             icon: {
@@ -80,7 +85,7 @@
           </template>
         </UInput>
       </div>
-      <div class="flex space-x-3">
+      <div class="flex space-x-3 items-center justify-self-end">
         <UButton
           icon="i-lucide-refresh-ccw"
           variant="outline"
@@ -481,6 +486,9 @@ const debouncedSearch = debounce(() => {
   SearchUrls()
 }, 500)
 watch(searchQuery, debouncedSearch)
+useHead({
+  title: 'Full Dashboard'
+})
 </script>
 <style scoped>
 :deep(tbody td) {

@@ -200,14 +200,6 @@
                 class="w-full"
                 @click="downloadQRCode"
               />
-              <UButton
-                icon="i-lucide-palette"
-                label="Customize QR Code"
-                size="sm"
-                variant="outline"
-                class="w-full"
-                @click="navigateTo(`/qr-code/customize/${link.id}`)"
-              />
             </div>
           </div>
         </UCard>
@@ -287,7 +279,6 @@ import QrcodeVue from 'qrcode.vue'
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
-const config = useState('config')
 
 // State
 const link = ref({
@@ -314,7 +305,9 @@ onMounted(() => {
   siteDomain.value = window.location.origin
 })
 
-const qrCodeValue = computed(() => `${siteDomain}/${link.value.shortUrl}`)
+const qrCodeValue = computed(
+  () => `${window.location.origin}/${link.value.shortUrl}`
+)
 
 const startEditing = () => {
   editedData.value = {
@@ -456,7 +449,7 @@ const closeDeleteModal = () => {
   isDeleteModalOpen.value = false
 }
 
-fetchLinkDetails()
+await fetchLinkDetails()
 
 watch(isDeleteModalOpen, (isOpen) => {
   const handler = (event) => {
@@ -472,5 +465,9 @@ watch(isEditing, (isEditing) => {
   }
   if (isEditing) document.addEventListener('keydown', handler)
   else document.removeEventListener('keydown', handler)
+})
+console.log(link.value)
+useHead({
+  title: link.value.shortUrl
 })
 </script>

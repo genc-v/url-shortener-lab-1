@@ -64,4 +64,7 @@ const columns = [
     cell: ({ row }) => timeAgo(row.getValue('createdAt'))
   }
 ]
+useHead({
+  title: 'App logs'
+})
 </script>
