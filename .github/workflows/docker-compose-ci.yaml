@@ -15,7 +15,7 @@ jobs:
 
       - name: Stop and clean up containers
         run: |
-          docker compose -p url-shortener down --remove-orphan
+          docker compose -p url-shortener down --remove-orphans
           docker network prune -f
 
       - name: Pull latest images
