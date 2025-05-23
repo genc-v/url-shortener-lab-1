@@ -176,13 +176,11 @@ const UProgress = resolveComponent('UProgress')
 const UPagination = resolveComponent('UPagination')
 const UTable = resolveComponent('UTable')
 
-// Composables
 const toast = useToast()
 const route = useRoute()
 const router = useRouter()
 const config = useState('config')
 
-// State
 const data = ref([])
 const currentpage = ref(route.query.page || 1)
 const isLoading = ref(true)
@@ -198,7 +196,6 @@ const value = ref(items.value[0])
 const searchQuery = ref(route.query.searchQuery || '')
 const isSearching = ref(false)
 
-// Computed properties
 const filteredData = computed(() => data.value)
 
 const clicksGrowth = computed(() => {
@@ -281,7 +278,7 @@ const formatDateTime = (dateString) => {
 }
 
 const copyShortUrl = (shortCode) => {
-  const fullUrl = `${config.value}/${shortCode}`
+  const fullUrl = `${window.location.origin}/${shortCode}`
   copyToClipboard(fullUrl)
 }
 
@@ -343,7 +340,6 @@ const handlePageChange = (newPage) => {
   })
 }
 
-// Table configuration
 const columns = [
   {
     accessorKey: 'id',

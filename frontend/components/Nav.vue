@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
 
+const isAdmin = useCookie('isAdmin')
+console.log(isAdmin.value)
+
 const items = ref<NavigationMenuItem[]>([
   {
     label: 'Home',
@@ -27,18 +30,33 @@ const items = ref<NavigationMenuItem[]>([
       }
     ]
   },
-
   {
     label: 'Settings',
     icon: 'i-heroicons-cog-6-tooth',
     description: 'Configure your account and preferences',
     children: [
       {
-        label: 'Settings',
-        icon: 'i-heroicons-cog-6-tooth',
+        label: 'Account Settings',
+        icon: 'i-heroicons-user-circle',
         to: '/settings',
-        description: 'Sign out of your account'
+        description: 'Manage your account preferences'
       },
+      ...(isAdmin.value
+        ? [
+            {
+              label: 'User Management',
+              icon: 'i-heroicons-users',
+              to: '/users',
+              description: 'Manage system users'
+            },
+            {
+              label: 'System Logs',
+              icon: 'i-heroicons-clipboard-document-list',
+              to: '/logs',
+              description: 'View system activity logs'
+            }
+          ]
+        : []),
       {
         label: 'Logout',
         icon: 'i-heroicons-arrow-left-on-rectangle',
@@ -46,8 +64,7 @@ const items = ref<NavigationMenuItem[]>([
         description: 'Sign out of your account'
       }
     ]
-  },
-  {}
+  }
 ])
 </script>
 
