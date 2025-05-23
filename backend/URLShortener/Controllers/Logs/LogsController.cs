@@ -21,7 +21,6 @@ namespace URLShortener.Controllers.Logs
         [Authorize]
         public IActionResult getLogs()
         {
-            // does this work??
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             bool isAdmin = Authentication.IsAdminFromToken(token);
 
