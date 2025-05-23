@@ -11,7 +11,7 @@ namespace URLShortener.Controllers
 
     [ApiController]
     [Route("/")]
-    [EnableCors]
+    [EnableCors]    
     public class URLRedirectController : ControllerBase
     {
         private UrlShortenerDbContext _context;

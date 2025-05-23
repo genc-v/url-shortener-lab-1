@@ -30,16 +30,28 @@
         </UFormField>
 
         <UFormField label="Password" name="password">
-          <UInput
-            v-model="state.password"
-            type="password"
-            size="lg"
-            placeholder="Enter your password"
-            class="w-full"
-          />
-        </UFormField>
-
-        <UButton type="submit" size="lg" class="w-full justify-center"
+          <div class="relative">
+            <UInput
+              v-model="state.password"
+              :type="showPassword ? 'text' : 'password'"
+              size="lg"
+              placeholder="Enter your password"
+              class="w-full pr-10"
+            />
+            <button
+              type="button"
+              class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+              @click="showPassword = !showPassword"
+            >
+              <UIcon
+                :name="
+                  showPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'
+                "
+                class="h-5 w-5"
+              />
+            </button>
+          </div> </UFormField
+        ><UButton type="submit" size="lg" class="w-full justify-center"
           >Login</UButton
         >
       </UForm>
@@ -55,7 +67,6 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { jwtDecode } from 'jwt-decode'
 
@@ -64,6 +75,7 @@ const state = ref({
   password: ''
 })
 
+const showPassword = ref(false)
 const router = useRouter()
 
 const validate = (state) => {
@@ -79,7 +91,7 @@ const login = async () => {
   const exp = useCookie('exp')
   const userId = useCookie('userId')
   const isAdmin = useCookie('isAdmin')
-  api('User/login', 'POST', state.value, false).then((data) => {
+  api('User/login', 'POST', state.value, false).then(async (data) => {
     token.value = data.token
     refreshToken.value = data.refreshToken
 
@@ -87,13 +99,16 @@ const login = async () => {
     exp.value = decoded.exp
     userId.value = decoded.nameid
     isAdmin.value = decoded.IsAdmin
-    router.push('/')
+    router.push('/dashboard')
   })
 }
 
 const token = useCookie('token')
 
 if (token.value) {
-  router.push('/')
+  router.push('/dashboard')
 }
+useHead({
+  title: 'Login'
+})
 </script>

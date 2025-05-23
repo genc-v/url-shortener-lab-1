@@ -2,11 +2,11 @@
   <div class="min-h-screen flex items-center justify-center p-4">
     <div class="w-full max-w-xl">
       <div
-        class="bg-gray-900 rounded-2xl shadow-xl p-10 border border-gray-800 transition-all duration-300 hover:shadow-2xl"
+        class="rounded-2xl shadow-xl p-10 border brightness-90 border-gray-700 transition-all duration-300 hover:shadow-2xl"
       >
         <!-- Header -->
         <div class="mb-8 text-center">
-          <h1 class="text-3xl font-bold text-white">Create New Short Link</h1>
+          <h1 class="text-3xl font-bold">Create New Short Link</h1>
           <p class="text-gray-400 mt-1">Quickly shorten and track your URLs</p>
         </div>
 
@@ -212,6 +212,9 @@ const copyToClipboard = async () => {
     })
   }
 }
+useHead({
+  title: 'Shorten a url'
+})
 </script>
 
 <style>

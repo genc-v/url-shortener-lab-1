@@ -1,7 +1,6 @@
 <template>
   <UApp>
     <Nav v-if="isLoggedIn" />
-
     <NuxtPage />
     <Footer v-if="isLoggedIn" />
   </UApp>
@@ -21,14 +20,6 @@ const analyticsData = useState('analyticsData', () => ({
   topLinks: [],
   recentLinks: []
 }))
-
-await api('URL/analytics', 'GET')
-  .then((response) => {
-    analyticsData.value = response
-  })
-  .catch((error) => {
-    console.error('Error fetching analytics data:', error)
-  })
 
 const token = useCookie('token')
 if (!token.value) {

@@ -14,7 +14,7 @@ namespace URLShortener.Service.User
         void Logout(int id, string rt);
         string SilentLogin(string rt, string t, int id);
         SignUpModel AddUser(SignUpModel request);
-        UserUpdate UpdateUser(int id, UserUpdate userInput);
+        UserUpdate UpdateUser(int id, UserUpdate userInput, bool isAdmin = false);
         void DeleteUser(int id);
 
     }

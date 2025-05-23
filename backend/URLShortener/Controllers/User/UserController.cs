@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using URLShortener.Database;
 using URLShortener.DTOs;
 using URLShortener.DTOs.User;
@@ -176,16 +177,54 @@ namespace URLShortener.Controllers
         [HttpPost("signup")]
         public IActionResult Signup([FromBody] SignUpModel request)
         {
+            var errors = new Dictionary<string, string>();
+
+            if (string.IsNullOrEmpty(request.Email))
+            {
+                errors["email"] = "Email is required";
+            }
+
+            if (string.IsNullOrEmpty(request.FullName))
+            {
+                errors["fullName"] = "Full name is required";
+            }
+            
+
+            if (string.IsNullOrEmpty(request.Password))
+            {
+                errors["password"] = "Password is required";
+            }
+            else
+            {
+                var passwordErrors = new List<string>();
+                if (request.Password.Length < 8)
+                    passwordErrors.Add("At least 8 characters");
+                if (!Regex.IsMatch(request.Password, "[A-Z]"))
+                    passwordErrors.Add("At least one uppercase letter (A-Z)");
+                if (!Regex.IsMatch(request.Password, "[a-z]"))
+                    passwordErrors.Add("At least one lowercase letter (a-z)");
+                if (!Regex.IsMatch(request.Password, "[0-9]"))
+                    passwordErrors.Add("At least one number (0-9)");
+                if (!Regex.IsMatch(request.Password, "[!@#$%^&*]"))
+                    passwordErrors.Add("At least one special character (!@#$%^&*)");
+            
+                if (passwordErrors.Count > 0)
+                    errors["password"] = "Password must contain: " + string.Join(", ", passwordErrors);
+            }
+
+            if (errors.Count > 0)
+            {
+                return BadRequest(new { Errors = errors });
+            }
 
             var newUser = _userService.AddUser(request);
 
-            if (newUser != null)
+            if (newUser == null)
             {
-                return Ok(newUser);
+                return Conflict("Email is already taken");
             }
 
-            return Conflict("Email is already taken");
-
+            return Ok(newUser);
         }
 
         [HttpPut("{id}")]
@@ -198,7 +237,7 @@ namespace URLShortener.Controllers
 
             if (isAdmin)
             {
-                var updatedUser = _userService.UpdateUser(id, userInput);
+                var updatedUser = _userService.UpdateUser(id, userInput, true);
                 if (updatedUser != null)
                 {
                     return Ok(updatedUser);
@@ -235,12 +274,12 @@ namespace URLShortener.Controllers
             {
                 _userService.DeleteUser(userId);
 
-                return Ok($"User with ID {id} deleted successfully");
+                return Ok(new { message = $"User with ID {id} deleted successfully" });
             }
             else if (isAdmin)
             {
                 _userService.DeleteUser(id);
-                return Ok($"User with ID {id} deleted successfully");
+                return Ok(new { message = $"User with ID {id} deleted successfully" });
             }
             return BadRequest($"User with ID {id} could not be found.");
 
