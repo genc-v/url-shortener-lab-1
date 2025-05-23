@@ -15,7 +15,6 @@ public static class TokenService
     public static string GenerateToken(int id, string email, string username, bool isAdmin)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        // TODO get the key from appsettings
         var key = Encoding.ASCII.GetBytes(_jwtKey);
 
         var tokenDescriptor = new SecurityTokenDescriptor

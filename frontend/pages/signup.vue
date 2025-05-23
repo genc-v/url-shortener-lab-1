@@ -87,7 +87,7 @@
         <UButton
           type="submit"
           size="lg"
-          class="w-full justify-center"
+          class="w-full cursor-pointer justify-center"
           :disabled="!formIsValid"
         >
           Sign Up
@@ -141,26 +141,8 @@ const passwordRequirements = computed(() => [
 ])
 
 const formIsValid = computed(() => {
-  return (
-    validateEmail(state.value.email) === true &&
-    validateFullName(state.value.fullName) === true &&
-    validatePassword(state.value.password) === true
-  )
+  return validatePassword(state.value.password) === true
 })
-
-const validateEmail = (value) => {
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-  if (!value) return 'Email is required'
-  if (!emailRegex.test(value)) return 'Please enter a valid email address'
-  return true
-}
-
-const validateFullName = (value) => {
-  const nameRegex = /^[a-zA-Z]+(?: [a-zA-Z]+){1,}$/
-  if (!value) return 'Full name is required'
-  if (!nameRegex.test(value)) return 'Please enter your first and last name'
-  return true
-}
 
 const validatePassword = (value) => {
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/

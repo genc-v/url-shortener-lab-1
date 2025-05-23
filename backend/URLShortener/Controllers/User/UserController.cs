@@ -183,19 +183,12 @@ namespace URLShortener.Controllers
             {
                 errors["email"] = "Email is required";
             }
-            else if (!Regex.IsMatch(request.Email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"))
-            {
-                errors["email"] = "Please enter a valid email address";
-            }
 
             if (string.IsNullOrEmpty(request.FullName))
             {
                 errors["fullName"] = "Full name is required";
             }
-            else if (!Regex.IsMatch(request.FullName, @"^[a-zA-Z]+(?: [a-zA-Z]+){1,}$"))
-            {
-                errors["fullName"] = "Please enter your first and last name";
-            }
+            
 
             if (string.IsNullOrEmpty(request.Password))
             {

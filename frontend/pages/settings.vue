@@ -207,7 +207,7 @@
             block
             color="primary"
             variant="solid"
-            class="transition-all duration-200"
+            class="transition-all duration-200 cursor-pointer"
             :ui="{ rounded: 'rounded-lg', padding: { xl: 'px-6 py-3.5' } }"
           >
             <template #leading>
@@ -338,10 +338,8 @@ const handlePasswordChange = async () => {
   const userId = useCookie('userId').value
 
   await api('User/' + userId, 'PUT', {
-    email: null,
-    fullName: null,
-    oldPassowrd: passwordForm.confirmPassword,
-    password: passwordForm.currentPassword
+    oldPassowrd: passwordForm.currentPassword,
+    password: passwordForm.confirmPassword
   })
     .then(() => {
       successMessage.value = 'Password changed successfully'
