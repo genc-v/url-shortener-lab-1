@@ -36,10 +36,10 @@ const errorMessages = {
 
 const primaryAction = computed(() => {
   return {
-    not_found: { label: 'Go to Homepage', to: '/' },
+    not_found: { label: 'Go to Homepage', to: '/dashboard' },
     server_error: { label: 'Try Again', action: () => refresh() },
     offline: { label: 'Retry Connection', action: () => location.reload() },
-    generic: { label: 'Go to Homepage', to: '/' }
+    generic: { label: 'Go to Homepage', to: '/dashboard' }
   }[errorType.value]
 })
 </script>

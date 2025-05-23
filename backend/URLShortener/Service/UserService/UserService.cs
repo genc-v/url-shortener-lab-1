@@ -386,7 +386,7 @@ namespace URLShortener.Service.User
             }
         }
 
-        public UserUpdate? UpdateUser(int id, UserUpdate userInput)
+        public UserUpdate? UpdateUser(int id, UserUpdate userInput, bool isAdmin)
         {
             try
             {
@@ -407,9 +407,9 @@ namespace URLShortener.Service.User
                     return null;
                 }
 
-                if (!string.IsNullOrEmpty(userInput.Password))
+                if (!string.IsNullOrEmpty(userInput.oldPassword))
                 {
-                    bool isPasswordValid = BCrypt.Net.BCrypt.Verify(userInput.Password, userToUpdate.PasswordHash);
+                    bool isPasswordValid = BCrypt.Net.BCrypt.Verify(userInput.oldPassword, userToUpdate.PasswordHash);
                     if (!isPasswordValid)
                     {
                         _context.Logs.Add(new Log
@@ -432,12 +432,10 @@ namespace URLShortener.Service.User
                     userToUpdate.FullName = userInput.FullName;
                 }
 
-                // Handle password change if new password is provided
-                if (!string.IsNullOrEmpty(userInput.oldPassword))
+                if (!string.IsNullOrEmpty(userInput.newPassword))
                 {
-                    if (string.IsNullOrEmpty(userInput.Password))
+                    if (string.IsNullOrEmpty(userInput.newPassword))
                     {
-                        // Require old password to set new password
                         _context.Logs.Add(new Log
                         {
                             Note = $"Attempted password change without old password for user ID: {id}",
@@ -446,9 +444,8 @@ namespace URLShortener.Service.User
                         _context.SaveChanges();
                         return null;
                     }
-                    userToUpdate.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userInput.oldPassword);
+                    userToUpdate.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userInput.newPassword);
                 }
-
                 _context.Logs.Add(new Log
                 {
                     Note = $"Updated user with ID: {id}",

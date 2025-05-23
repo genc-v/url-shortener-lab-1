@@ -114,7 +114,10 @@
           wrapper: 'h-full flex flex-col',
           thead: 'sticky top-0 z-10',
           tbody: 'flex-1',
-          td: { base: 'whitespace-nowrap', padding: 'py-3 px-4' },
+          td: {
+            base: 'whitespace-nowrap',
+            padding: 'py-3 px-4'
+          },
           th: {
             base: 'text-left bg-gray-50 dark:bg-gray-700/50',
             padding: 'py-3 px-4'
@@ -483,3 +486,11 @@ const debouncedSearch = debounce(() => {
 }, 500)
 watch(searchQuery, debouncedSearch)
 </script>
+<style scoped>
+:deep(tbody td) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+</style>

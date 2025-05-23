@@ -5,13 +5,12 @@ const items = ref<NavigationMenuItem[]>([
   {
     label: 'Home',
     icon: 'i-heroicons-home',
-    to: '/',
+    to: '/dashboard',
     description: 'Return to the dashboard overview'
   },
   {
     label: 'Links',
     icon: 'i-heroicons-link',
-    to: '/link/all',
     description: 'Manage your shortened links',
     children: [
       {
@@ -32,15 +31,23 @@ const items = ref<NavigationMenuItem[]>([
   {
     label: 'Settings',
     icon: 'i-heroicons-cog-6-tooth',
-    to: '/settings',
-    description: 'Configure your account and preferences'
+    description: 'Configure your account and preferences',
+    children: [
+      {
+        label: 'Settings',
+        icon: 'i-heroicons-cog-6-tooth',
+        to: '/settings',
+        description: 'Sign out of your account'
+      },
+      {
+        label: 'Logout',
+        icon: 'i-heroicons-arrow-left-on-rectangle',
+        to: '/logout',
+        description: 'Sign out of your account'
+      }
+    ]
   },
-  {
-    label: 'Logout',
-    icon: 'i-heroicons-arrow-left-on-rectangle',
-    to: '/logout',
-    description: 'Sign out of your account'
-  }
+  {}
 ])
 </script>
 

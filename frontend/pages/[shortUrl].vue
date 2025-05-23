@@ -8,10 +8,10 @@ const router = useRouter()
 
 await api(route.params.shortUrl, 'GET', {}, false)
   .then((res) => {
-    // send it to the site of the res
     navigateTo(res.url, { external: true })
   })
   .catch((err) => {
+    router.push('/')
     console.error('Error:', err)
   })
 </script>

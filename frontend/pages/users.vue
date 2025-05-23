@@ -319,7 +319,7 @@ const submitEdit = async () => {
 // Table configuration
 const columns = [
   {
-    accessorKey: 'id',
+    accessorkey: 'id',
     header: 'ID',
     cell: ({ row }) => `#${row.getValue('id')}`,
     meta: { width: '80px', align: 'center' }

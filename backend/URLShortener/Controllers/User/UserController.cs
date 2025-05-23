@@ -198,7 +198,7 @@ namespace URLShortener.Controllers
 
             if (isAdmin)
             {
-                var updatedUser = _userService.UpdateUser(id, userInput);
+                var updatedUser = _userService.UpdateUser(id, userInput, true);
                 if (updatedUser != null)
                 {
                     return Ok(updatedUser);
@@ -235,12 +235,12 @@ namespace URLShortener.Controllers
             {
                 _userService.DeleteUser(userId);
 
-                return Ok($"User with ID {id} deleted successfully");
+                return Ok(new { message = $"User with ID {id} deleted successfully" });
             }
             else if (isAdmin)
             {
                 _userService.DeleteUser(id);
-                return Ok($"User with ID {id} deleted successfully");
+                return Ok(new { message = $"User with ID {id} deleted successfully" });
             }
             return BadRequest($"User with ID {id} could not be found.");
 
