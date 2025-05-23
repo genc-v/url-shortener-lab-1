@@ -74,6 +74,31 @@
             />
           </div>
 
+          <!-- Submit Button -->
+          <UButton
+            type="submit"
+            :disabled="loading || !formChanged"
+            block
+            color="primary"
+            variant="solid"
+            class="transition-all duration-200 cursor-pointer"
+            :ui="{ rounded: 'rounded-lg', padding: { xl: 'px-6 py-3.5' } }"
+          >
+            <template #leading>
+              <UIcon
+                v-if="!loading"
+                name="i-heroicons-check-20-solid"
+                class="w-5 h-5"
+              />
+              <UIcon
+                v-else
+                name="i-heroicons-arrow-path-20-solid"
+                class="animate-spin w-5 h-5"
+              />
+            </template>
+            {{ loading ? 'Saving...' : 'Save Changes' }}
+          </UButton>
+
           <!-- Password Change Section -->
           <div class="pt-4 border-t border-gray-800">
             <h3 class="text-lg font-medium text-gray-300 mb-4">
@@ -112,35 +137,67 @@
 
             <!-- New Password -->
             <div class="mb-4">
-              <label
-                for="newPassword"
-                class="block text-sm font-medium text-gray-300 mb-1"
+              <UFormField
+                label="New Password"
+                name="newPassword"
+                :rules="validatePassword"
               >
-                New Password
-              </label>
-              <UInput
-                id="newPassword"
-                v-model="passwordForm.newPassword"
-                type="password"
-                placeholder="••••••••"
-                icon="i-heroicons-lock-closed-16-solid"
-                color="gray"
-                variant="outline"
-                class="w-full"
-                :disabled="loading"
-                :ui="{
-                  base: 'pl-10',
-                  color: {
-                    gray: {
-                      outline:
-                        'dark:bg-gray-950 ring-gray-700 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-500'
+                <UInput
+                  id="newPassword"
+                  v-model="passwordForm.newPassword"
+                  type="password"
+                  placeholder="••••••••"
+                  icon="i-heroicons-lock-closed-16-solid"
+                  color="gray"
+                  variant="outline"
+                  class="w-full"
+                  :disabled="loading"
+                  :ui="{
+                    base: 'pl-10',
+                    color: {
+                      gray: {
+                        outline:
+                          'dark:bg-gray-950 ring-gray-700 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-500'
+                      }
                     }
-                  }
-                }"
-              />
-              <p class="mt-1 text-xs text-gray-500">
-                Password must be at least 8 characters long
-              </p>
+                  }"
+                />
+                <template #error="{ error }">
+                  <span class="text-red-500 text-sm">{{ error }}</span>
+                </template>
+
+                <div class="mt-3 space-y-2">
+                  <div
+                    v-for="(req, index) in passwordRequirements"
+                    :key="index"
+                    class="flex items-center gap-2 transition-colors"
+                  >
+                    <UIcon
+                      :name="
+                        req.isMet
+                          ? 'i-heroicons-check-circle-20-solid'
+                          : 'i-heroicons-x-circle-20-solid'
+                      "
+                      :class="[
+                        req.isMet
+                          ? 'text-green-500 dark:text-green-400'
+                          : 'text-red-500 dark:text-red-400',
+                        'w-4 h-4 shrink-0'
+                      ]"
+                    />
+                    <span
+                      :class="[
+                        'text-xs',
+                        req.isMet
+                          ? 'text-green-600 dark:text-green-300'
+                          : 'text-gray-500 dark:text-gray-400'
+                      ]"
+                    >
+                      {{ req.label }}
+                    </span>
+                  </div>
+                </div>
+              </UFormField>
             </div>
 
             <!-- Confirm New Password -->
@@ -171,13 +228,23 @@
                   }
                 }"
               />
+              <p
+                v-if="
+                  passwordForm.newPassword &&
+                  passwordForm.confirmPassword &&
+                  passwordForm.newPassword !== passwordForm.confirmPassword
+                "
+                class="mt-1 text-xs text-red-500"
+              >
+                Passwords do not match
+              </p>
             </div>
 
             <!-- Change Password Button -->
             <UButton
               type="button"
               @click="handlePasswordChange"
-              :disabled="loading || !passwordChanged"
+              :disabled="loading || !passwordIsValid"
               block
               color="primary"
               variant="outline"
@@ -199,31 +266,6 @@
               {{ loading ? 'Updating...' : 'Update Password' }}
             </UButton>
           </div>
-
-          <!-- Submit Button -->
-          <UButton
-            type="submit"
-            :disabled="loading || !formChanged"
-            block
-            color="primary"
-            variant="solid"
-            class="transition-all duration-200 cursor-pointer"
-            :ui="{ rounded: 'rounded-lg', padding: { xl: 'px-6 py-3.5' } }"
-          >
-            <template #leading>
-              <UIcon
-                v-if="!loading"
-                name="i-heroicons-check-20-solid"
-                class="w-5 h-5"
-              />
-              <UIcon
-                v-else
-                name="i-heroicons-arrow-path-20-solid"
-                class="animate-spin w-5 h-5"
-              />
-            </template>
-            {{ loading ? 'Saving...' : 'Save Changes' }}
-          </UButton>
         </form>
 
         <transition name="fade">
@@ -338,8 +380,10 @@ const handlePasswordChange = async () => {
   const userId = useCookie('userId').value
 
   await api('User/' + userId, 'PUT', {
-    oldPassowrd: passwordForm.currentPassword,
-    password: passwordForm.confirmPassword
+    email: null,
+    fullName: null,
+    oldPassword: passwordForm.currentPassword,
+    newPassword: passwordForm.confirmPassword
   })
     .then(() => {
       successMessage.value = 'Password changed successfully'
@@ -360,6 +404,48 @@ const handlePasswordChange = async () => {
       loading.value = false
     })
 }
+
+const passwordRequirements = computed(() => [
+  {
+    label: 'At least 8 characters',
+    isMet: passwordForm.newPassword.length >= 8
+  },
+  {
+    label: 'Contains at least one uppercase letter',
+    isMet: /[A-Z]/.test(passwordForm.newPassword)
+  },
+  {
+    label: 'Contains at least one lowercase letter',
+    isMet: /[a-z]/.test(passwordForm.newPassword)
+  },
+  {
+    label: 'Contains at least one number',
+    isMet: /\d/.test(passwordForm.newPassword)
+  },
+  {
+    label: 'Contains at least one special character (!@#$%^&*)',
+    isMet: /[!@#$%^&*]/.test(passwordForm.newPassword)
+  }
+])
+
+const validatePassword = (value) => {
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/
+  if (!value) return 'Password is required'
+  if (!passwordRegex.test(value)) {
+    return 'Password does not meet requirements'
+  }
+  return true
+}
+
+const passwordIsValid = computed(() => {
+  return (
+    passwordForm.currentPassword &&
+    passwordForm.newPassword &&
+    passwordForm.confirmPassword &&
+    passwordForm.newPassword === passwordForm.confirmPassword &&
+    validatePassword(passwordForm.newPassword) === true
+  )
+})
 
 fetchUserData()
 </script>

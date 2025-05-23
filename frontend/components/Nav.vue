@@ -2,7 +2,6 @@
 import type { NavigationMenuItem } from '@nuxt/ui'
 
 const isAdmin = useCookie('isAdmin')
-console.log(isAdmin.value)
 
 const items = ref<NavigationMenuItem[]>([
   {

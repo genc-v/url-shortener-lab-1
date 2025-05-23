@@ -63,29 +63,35 @@
             Edit User
           </h2>
           <form @submit.prevent="submitEdit">
-            <div class="space-y-4">
+            <div class="space-y-4 grid cols-3">
               <UFormGroup label="Name" name="name">
+                <p>Name</p>
                 <UInput
                   v-model="editForm.name"
                   placeholder="Enter user name"
                   required
+                  class="w-full"
                 />
               </UFormGroup>
 
               <UFormGroup label="Email" name="email">
+                <p>Email</p>
                 <UInput
                   v-model="editForm.email"
                   type="email"
                   placeholder="Enter email"
+                  class="w-full"
                   required
                 />
               </UFormGroup>
 
               <UFormGroup label="Password" name="password">
+                <p>Password</p>
                 <UInput
                   v-model="editForm.password"
                   type="password"
                   placeholder="Leave blank to keep current"
+                  class="w-full"
                 />
               </UFormGroup>
             </div>
@@ -285,8 +291,7 @@ const submitEdit = async () => {
     const payload = {
       email: editForm.value.email,
       fullName: editForm.value.name,
-      oldPassword: null,
-      newPassword: null
+      newPassword: editForm.value.password
     }
 
     if (editForm.value.password) {
