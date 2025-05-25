@@ -86,11 +86,41 @@ const validate = (state) => {
 }
 
 const login = async () => {
-  const token = useCookie('token')
-  const refreshToken = useCookie('refreshToken')
-  const exp = useCookie('exp')
-  const userId = useCookie('userId')
-  const isAdmin = useCookie('isAdmin')
+  const token = useCookie('token', {
+    maxAge: 60 * 60 * 24 * 30,
+    sameSite: 'lax',
+    secure: true,
+    path: '/'
+  })
+
+  const refreshToken = useCookie('refreshToken', {
+    maxAge: 60 * 60 * 24 * 30,
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: true,
+    path: '/'
+  })
+
+  const exp = useCookie('exp', {
+    maxAge: 60 * 60 * 24 * 30,
+    sameSite: 'lax',
+    secure: true,
+    path: '/'
+  })
+
+  const userId = useCookie('userId', {
+    maxAge: 60 * 60 * 24 * 30,
+    sameSite: 'lax',
+    secure: true,
+    path: '/'
+  })
+
+  const isAdmin = useCookie('isAdmin', {
+    maxAge: 60 * 60 * 24 * 30,
+    sameSite: 'lax',
+    secure: true,
+    path: '/'
+  })
   api('User/login', 'POST', state.value, false).then(async (data) => {
     token.value = data.token
     refreshToken.value = data.refreshToken
