@@ -218,6 +218,11 @@ const fetchUsers = async () => {
       icon: 'i-lucide-alert-circle',
       timeout: 5000
     })
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'User Is Unauthorized',
+      fatal: true
+    })
   } finally {
     isLoading.value = false
   }
@@ -405,6 +410,7 @@ watch([isDeleteModalOpen, isEditModalOpen], ([deleteOpen, editOpen]) => {
     document.removeEventListener('keydown', handler)
   }
 })
+
 useHead({
   title: 'Manage Users'
 })

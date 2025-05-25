@@ -11,13 +11,13 @@ const errorType = computed(() => {
 
 const errorMessages = {
   not_found: {
-    title: 'Page Not Found',
+    title: error.value.statusMessage || 'Page Not Found',
     description:
       'The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.',
     icon: 'i-heroicons-magnifying-glass'
   },
   server_error: {
-    title: 'Server Error',
+    title: error.value.statusMessage || 'Server Error',
     description:
       'Something went wrong on our end. Our team has been notified and we are working to fix it.',
     icon: 'i-heroicons-server-stack'
@@ -28,7 +28,7 @@ const errorMessages = {
     icon: 'i-heroicons-signal-slash'
   },
   generic: {
-    title: 'Something Went Wrong',
+    title: error.value.statusMessage || 'Something Went Wrong',
     description: 'An unexpected error occurred. Please try again later.',
     icon: 'i-heroicons-exclamation-triangle'
   }
@@ -57,7 +57,7 @@ const primaryAction = computed(() => {
           </NuxtLink>
           <div class="flex space-x-4">
             <UButton
-              to="/links/add"
+              to="/link/add"
               icon="i-heroicons-plus"
               label="Create New"
               color="primary"

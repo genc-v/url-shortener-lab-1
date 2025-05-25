@@ -104,29 +104,42 @@
 </template>
 
 <script setup>
-const analyticsData = ref()
+const token = useCookie('token')
+const router = useRouter()
+const isLoading = ref(true)
+const analyticsData = ref(null)
 
-const data = []
+if (!token.value) {
+  await router.push('/login')
+} else {
+  await loadDashboardData()
+}
 
-await api('URL/analytics', 'GET')
-  .then((response) => {
+async function loadDashboardData() {
+  try {
+    const response = await api('URL/analytics', 'GET')
     analyticsData.value = response
-  })
-  .catch((error) => {
+  } catch (error) {
     console.error('Error fetching analytics data:', error)
-  })
+  } finally {
+    isLoading.value = false
+  }
+}
 
-analyticsData.value.recentLinks.forEach((link) => {
-  data.push({
-    Url: link.originalUrl,
-    ShortUrl: link.shortUrl,
-    Date: timeAgo(link.dateCreated)
-  })
+const recentLinks = computed(() => {
+  return (
+    analyticsData.value?.recentLinks?.map((link) => ({
+      Url: link.originalUrl,
+      ShortUrl: link.shortUrl,
+      Date: timeAgo(link.dateCreated)
+    })) || []
+  )
 })
-const recentLinks = computed(() => data || [])
+
 const topLinks = computed(() => analyticsData.value?.topLinks || [])
+
 useHead({
-  title: 'Dashbaord'
+  title: 'Dashboard'
 })
 </script>
 

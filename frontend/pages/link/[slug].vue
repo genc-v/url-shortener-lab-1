@@ -270,6 +270,7 @@
         </div>
       </div>
     </transition>
+    <NuxtLink to="/link/32">test</NuxtLink>
   </div>
 </template>
 
@@ -447,7 +448,13 @@ const closeDeleteModal = () => {
   isDeleteModalOpen.value = false
 }
 
-await fetchLinkDetails()
+await fetchLinkDetails().catch(() => {
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Url not found',
+    fatal: true
+  })
+})
 
 watch(isDeleteModalOpen, (isOpen) => {
   const handler = (event) => {

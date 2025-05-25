@@ -189,7 +189,6 @@ const UTable = resolveComponent('UTable')
 const toast = useToast()
 const route = useRoute()
 const router = useRouter()
-const config = useState('config')
 
 const data = ref([])
 const currentpage = ref(route.query.page || 1)
