@@ -147,7 +147,6 @@
 </template>
 
 <script setup>
-const config = useState('config')
 const link = ref('')
 const description = ref('')
 const shortUrl = ref('')

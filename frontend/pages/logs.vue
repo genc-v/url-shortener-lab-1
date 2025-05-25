@@ -43,10 +43,18 @@
 const isLoading = ref(true)
 const data = ref([])
 
-await api('logs', 'GET').then((result) => {
-  data.value = result.slice().reverse()
-  isLoading.value = false
-})
+await api('logs', 'GET')
+  .then((result) => {
+    data.value = result.slice().reverse()
+    isLoading.value = false
+  })
+  .catch(() => {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'User Is Unauthorized',
+      fatal: true
+    })
+  })
 
 const columns = [
   {

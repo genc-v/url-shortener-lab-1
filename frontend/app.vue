@@ -1,8 +1,10 @@
 <template>
   <UApp>
-    <Nav v-if="isLoggedIn" />
-    <NuxtPage />
-    <Footer v-if="isLoggedIn" />
+    <div class="flex min-h-screen flex-col">
+      <Nav v-if="isLoggedIn" />
+      <NuxtPage class="w-full flex-grow" />
+      <Footer v-if="isLoggedIn" />
+    </div>
   </UApp>
 </template>
 
@@ -11,15 +13,7 @@ const runtimeConfig = useRuntimeConfig()
 const router = useRouter()
 const route = useRoute()
 const _config = useState('config', () => runtimeConfig.public)
-const { ui } = useUi()
-const isLoggedIn = ref('loggedIn', () => true)
-
-const analyticsData = useState('analyticsData', () => ({
-  totalUrls: 0,
-  totalClicks: 0,
-  topLinks: [],
-  recentLinks: []
-}))
+const isLoggedIn = ref('loggedIn', () => false)
 
 const token = useCookie('token')
 if (!token.value) {
@@ -34,14 +28,6 @@ watch(route, () => {
     isLoggedIn.value = false
   } else {
     isLoggedIn.value = true
-  }
-})
-
-useHead({
-  htmlAttrs: {
-    class: computed(() => {
-      return [`primary-${ui.value.primary}`, `gray-${ui.value.gray}`].join(' ')
-    })
   }
 })
 </script>
