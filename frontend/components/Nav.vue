@@ -70,8 +70,7 @@ const items = ref<NavigationMenuItem[]>([
 <template>
   <UNavigationMenu
     variant="pill"
-    content-orientation="vertical"
     :items="items"
-    class="z-50 justify-center"
+    class="z-50 w-fit m-auto justify-center"
   />
 </template>

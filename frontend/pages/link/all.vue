@@ -85,7 +85,9 @@
           </template>
         </UInput>
       </div>
-      <div class="flex space-x-3 items-center justify-self-end">
+      <div
+        class="flex space-x-3 items-center md:justify-self-end justify-self-center"
+      >
         <UButton
           icon="i-lucide-refresh-ccw"
           variant="outline"
@@ -162,7 +164,10 @@
       </UTable>
     </div>
 
-    <div v-if="!isSearching" class="flex items-center justify-between mt-4">
+    <div
+      v-if="!isSearching"
+      class="flex items-center flex-wrap-reverse justify-center gap-5 md:justify-between mt-4"
+    >
       <USelect v-model="value" :items="items" class="w-20" />
       <UPagination
         v-model:page="page"
