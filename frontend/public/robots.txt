@@ -12,9 +12,5 @@ Disallow: /users
 Disallow: /link/add
 Disallow: /link/all
 
-Allow: /link/[slug]
-
-Allow: /favicon.ico
-Allow: /robots.txt
 
 Crawl-delay: 5

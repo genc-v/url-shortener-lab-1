@@ -44,7 +44,7 @@ export default defineNuxtConfig({
         { name: 'robots', content: 'index, follow' }
       ],
       link: [
-        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { rel: 'icon', type: 'image/x-icon', href: '/logo.png' },
         { rel: 'canonical', href: 'https://bytely.xyz' }
       ],
       script: [
