@@ -95,8 +95,7 @@ const login = async () => {
 
   const refreshToken = useCookie('refreshToken', {
     maxAge: 60 * 60 * 24 * 30,
-    httpOnly: true,
-    sameSite: 'strict',
+    sameSite: 'lax',
     secure: true,
     path: '/'
   })
@@ -121,7 +120,7 @@ const login = async () => {
     secure: true,
     path: '/'
   })
-  api('User/login', 'POST', state.value, false).then(async (data) => {
+  api('User/login', 'POST', state.value, false).then((data) => {
     token.value = data.token
     refreshToken.value = data.refreshToken
 
