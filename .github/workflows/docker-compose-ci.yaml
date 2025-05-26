@@ -13,10 +13,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Stop and clean up containers
-        run: |
-          docker compose -p url-shortener down --remove-orphans
-          docker network prune -f
+      - name: Stop and remove containers
+        run: docker compose -p url-shortener down
 
-      - name: Rebuild and restart containers
-        run: docker compose -p url-shortener up -d --build --remove-orphans
+      - name: Rebuild and start containers
+        run: docker compose -p url-shortener up -d --build
