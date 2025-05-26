@@ -1,22 +1,34 @@
-# Dockerfile
-FROM node:lts
+# Build Stage 1
 
-# create destination directory
-RUN mkdir -p /usr/src/nuxt-app
-WORKDIR /usr/src/nuxt-app
+FROM node:22-alpine AS build
+WORKDIR /app
 
-# update and install dependency
-RUN apk update && apk upgrade
-RUN apk add git
+RUN corepack enable
 
-# copy the app, note .dockerignore
-COPY . /usr/src/nuxt-app/
-RUN npm install
-RUN npm run build
+# Copy package.json and your lockfile, here we add pnpm-lock.yaml for illustration
+COPY package.json pnpm-lock.yaml .npmrc ./
 
-EXPOSE 3000
+# Install dependencies
+RUN pnpm i
 
-ENV NUXT_HOST=0.0.0.0
-ENV NUXT_PORT=3000
+# Copy the entire project
+COPY . ./
 
-CMD [ "node", "./.output/server/index.mjs" ]
+# Build the project
+RUN pnpm run build
+
+# Build Stage 2
+
+FROM node:22-alpine
+WORKDIR /app
+
+# Only `.output` folder is needed from the build stage
+COPY --from=build /app/.output/ ./
+
+# Change the port and host
+ENV PORT 80
+ENV HOST 0.0.0.0
+
+EXPOSE 80
+
+CMD ["node", "/app/server/index.mjs"]
