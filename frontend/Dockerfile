@@ -1,34 +1,19 @@
-# Build Stage 1
+FROM node:18-alpine as build
 
-FROM node:22-alpine AS build
 WORKDIR /app
 
-RUN corepack enable
+COPY package*.json /app
 
-# Copy package.json and your lockfile, here we add pnpm-lock.yaml for illustration
-COPY package.json pnpm-lock.yaml .npmrc ./
+RUN npm install
 
-# Install dependencies
-RUN pnpm i
+COPY . /app
 
-# Copy the entire project
-COPY . ./
+RUN npm run build
 
-# Build the project
-RUN pnpm run build
+FROM gcr.io/distroless/nodejs:18 as prod
 
-# Build Stage 2
-
-FROM node:22-alpine
 WORKDIR /app
 
-# Only `.output` folder is needed from the build stage
-COPY --from=build /app/.output/ ./
+COPY --from=build /app/.output /app/.output
 
-# Change the port and host
-ENV PORT 80
-ENV HOST 0.0.0.0
-
-EXPOSE 80
-
-CMD ["node", "/app/server/index.mjs"]
+CMD ["/app/.output/server/index.mjs"]
