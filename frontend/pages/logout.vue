@@ -32,5 +32,6 @@ await api('User/Logout', 'DELETE', rtoken.value)
     userId.value = null
     const isAdmin = useCookie('isAdmin')
     isAdmin.value = null
+    router.replace('/login')
   })
 </script>

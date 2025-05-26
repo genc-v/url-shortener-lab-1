@@ -81,7 +81,6 @@ const fetchToken = async () => {
   const toast: any = useToast()
   const url = `${config.value.API}api/User/silent-login`
   const token = useCookie('byToken')
-  debugger
   const rt = useCookie('byRefreshToken', {
     maxAge: 60 * 60 * 24 * 30,
     sameSite: 'lax',
@@ -109,17 +108,12 @@ const fetchToken = async () => {
       body: JSON.stringify(rt.value)
     })
 
-    if (!response.ok) {
-      throw new Error(`Silent login failed with status ${response.status}`)
-    }
-
     const newTokens = await response.json()
 
-    if (!newTokens.token || !newTokens.refreshToken) {
+    if (!newTokens.token) {
       throw new Error('Invalid token response')
     }
 
-    // Set new token
     const setToken = useCookie('byToken', {
       maxAge: 60 * 60 * 24 * 30,
       sameSite: 'lax',
@@ -128,31 +122,12 @@ const fetchToken = async () => {
     })
     setToken.value = newTokens.token
 
-    // Set new refresh token
-    const setRefreshToken = useCookie('byRefreshToken', {
-      maxAge: 60 * 60 * 24 * 30,
-      sameSite: 'lax',
-      secure: true,
-      path: '/'
-    })
-    setRefreshToken.value = newTokens.refreshToken
-
-    // Set expiration
-    const decoded: any = jwtDecode(newTokens.token)
+    const decoded: any = await jwtDecode(newTokens.token)
     const setExp = useCookie('exp')
     setExp.value = decoded.exp.toString()
 
     return
   } catch (error) {
-    console.error('Fetch error:', error)
-    toast.add({
-      title: 'Silent login failed',
-      description: error instanceof Error ? error.message : 'Unknown error',
-      color: 'red'
-    })
-    // Clear invalid tokens
-    useCookie('byToken').value = null
-    useCookie('byRefreshToken').value = null
-    useCookie('exp').value = null
+    console.error(error)
   }
 }
