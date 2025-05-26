@@ -4,13 +4,13 @@
 
 <script setup>
 const router = useRouter()
-const rtoken = useCookie('refreshToken')
+const rtoken = useCookie('byRefreshToken')
 
 await api('User/Logout', 'DELETE', rtoken.value)
   .then(() => {
-    const token = useCookie('token')
+    const token = useCookie('byToken')
     token.value = null
-    const rToken = useCookie('refreshToken')
+    const rToken = useCookie('byRefreshToken')
     rToken.value = null
     const exp = useCookie('exp')
     exp.value = null
@@ -22,5 +22,15 @@ await api('User/Logout', 'DELETE', rtoken.value)
   })
   .catch((error) => {
     console.error(error)
+    const token = useCookie('byToken')
+    token.value = null
+    const rToken = useCookie('byRefreshToken')
+    rToken.value = null
+    const exp = useCookie('exp')
+    exp.value = null
+    const userId = useCookie('userId')
+    userId.value = null
+    const isAdmin = useCookie('isAdmin')
+    isAdmin.value = null
   })
 </script>

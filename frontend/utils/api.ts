@@ -13,10 +13,10 @@ export const api = async (
   }
 
   if (needsToken) {
-    const token = useCookie('token')
-    const exp: any = useCookie('exp')
+    const token = useCookie('byToken')
+    const exp = useCookie('exp')
 
-    if (!token.value == null || !exp.value == null) {
+    if (!token.value || !exp.value) {
       toast.add({
         title: 'Error fetching data',
         description: 'Token not found',
@@ -25,12 +25,12 @@ export const api = async (
       return
     }
 
-    const tokenExp = exp.value * 1000 < Date.now()
+    const tokenExp = Number(exp.value) * 1000 < Date.now()
     if (tokenExp) {
       await fetchToken()
     }
 
-    const validToken = useCookie('token')
+    const validToken = useCookie('byToken')
     headers['Authorization'] = `Bearer ${validToken.value}`
   }
 
@@ -75,12 +75,19 @@ export const api = async (
     throw error
   }
 }
+
 const fetchToken = async () => {
   const config: any = useState('config')
   const toast: any = useToast()
   const url = `${config.value.API}api/User/silent-login`
-  const token = useCookie('token')
-  const rt = useCookie('refreshToken')
+  const token = useCookie('byToken')
+  debugger
+  const rt = useCookie('byRefreshToken', {
+    maxAge: 60 * 60 * 24 * 30,
+    sameSite: 'lax',
+    secure: true,
+    path: '/'
+  })
 
   if (!token.value || !rt.value) {
     toast.add({
@@ -102,25 +109,50 @@ const fetchToken = async () => {
       body: JSON.stringify(rt.value)
     })
 
-    const newToken = await response.json()
+    if (!response.ok) {
+      throw new Error(`Silent login failed with status ${response.status}`)
+    }
 
-    const setToken = useCookie('token', {
+    const newTokens = await response.json()
+
+    if (!newTokens.token || !newTokens.refreshToken) {
+      throw new Error('Invalid token response')
+    }
+
+    // Set new token
+    const setToken = useCookie('byToken', {
       maxAge: 60 * 60 * 24 * 30,
       sameSite: 'lax',
       secure: true,
       path: '/'
     })
-    setToken.value = newToken.token
+    setToken.value = newTokens.token
 
-    const decoded: any = jwtDecode(newToken.token)
-    const exp = useCookie('exp')
-    exp.value = decoded.exp
+    // Set new refresh token
+    const setRefreshToken = useCookie('byRefreshToken', {
+      maxAge: 60 * 60 * 24 * 30,
+      sameSite: 'lax',
+      secure: true,
+      path: '/'
+    })
+    setRefreshToken.value = newTokens.refreshToken
+
+    // Set expiration
+    const decoded: any = jwtDecode(newTokens.token)
+    const setExp = useCookie('exp')
+    setExp.value = decoded.exp.toString()
+
     return
   } catch (error) {
     console.error('Fetch error:', error)
     toast.add({
       title: 'Silent login failed',
+      description: error instanceof Error ? error.message : 'Unknown error',
       color: 'red'
     })
+    // Clear invalid tokens
+    useCookie('byToken').value = null
+    useCookie('byRefreshToken').value = null
+    useCookie('exp').value = null
   }
 }

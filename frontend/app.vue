@@ -15,14 +15,14 @@ const route = useRoute()
 const _config = useState('config', () => runtimeConfig.public)
 const isLoggedIn = ref('loggedIn', () => false)
 
-const token = useCookie('token')
+const token = useCookie('byToken')
 if (!token.value) {
   isLoggedIn.value = false
   router.push('/login')
 }
 
 watch(route, () => {
-  const token = useCookie('token')
+  const token = useCookie('byToken')
 
   if (!token.value) {
     isLoggedIn.value = false

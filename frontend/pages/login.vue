@@ -86,14 +86,14 @@ const validate = (state) => {
 }
 
 const login = async () => {
-  const token = useCookie('token', {
+  const token = useCookie('byToken', {
     maxAge: 60 * 60 * 24 * 30,
     sameSite: 'lax',
     secure: true,
     path: '/'
   })
 
-  const refreshToken = useCookie('refreshToken', {
+  const refreshToken = useCookie('byRefreshToken', {
     maxAge: 60 * 60 * 24 * 30,
     sameSite: 'lax',
     secure: true,
@@ -132,7 +132,7 @@ const login = async () => {
   })
 }
 
-const token = useCookie('token')
+const token = useCookie('byToken')
 
 if (token.value) {
   router.push('/dashboard')

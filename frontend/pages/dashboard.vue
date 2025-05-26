@@ -104,7 +104,7 @@
 </template>
 
 <script setup>
-const token = useCookie('token')
+const token = useCookie('byToken')
 const router = useRouter()
 const isLoading = ref(true)
 const analyticsData = ref(null)
