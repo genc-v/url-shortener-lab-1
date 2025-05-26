@@ -419,7 +419,7 @@ const downloadQRCode = () => {
 
 const confirmDelete = async () => {
   isDeleting.value = true
-  api('Url/' + route.params.slug, 'DELETE')
+  await api('Url/' + route.params.slug, 'DELETE')
     .then(() => {
       toast.add({
         title: 'URL deleted',

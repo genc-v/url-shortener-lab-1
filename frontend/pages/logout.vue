@@ -6,7 +6,7 @@
 const router = useRouter()
 const rtoken = useCookie('refreshToken')
 
-api('User/Logout', 'DELETE', rtoken.value)
+await api('User/Logout', 'DELETE', rtoken.value)
   .then(() => {
     const token = useCookie('token')
     token.value = null

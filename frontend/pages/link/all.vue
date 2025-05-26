@@ -439,7 +439,7 @@ const columns = [
 ]
 const SearchUrls = async () => {
   if (searchQuery.value) {
-    api('search?UrlName=' + searchQuery.value, 'GET')
+    await api('search?UrlName=' + searchQuery.value, 'GET')
       .then((result) => {
         data.value = result
       })

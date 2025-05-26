@@ -120,7 +120,7 @@ const login = async () => {
     secure: true,
     path: '/'
   })
-  api('User/login', 'POST', state.value, false).then((data) => {
+  await api('User/login', 'POST', state.value, false).then((data) => {
     token.value = data.token
     refreshToken.value = data.refreshToken
 
