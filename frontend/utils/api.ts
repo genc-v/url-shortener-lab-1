@@ -123,7 +123,12 @@ const fetchToken = async () => {
     setToken.value = newTokens.token
 
     const decoded: any = await jwtDecode(newTokens.token)
-    const setExp = useCookie('exp')
+    const setExp = useCookie('exp', {
+      maxAge: 60 * 60 * 24 * 30,
+      sameSite: 'lax',
+      secure: true,
+      path: '/'
+    })
     setExp.value = decoded.exp.toString()
 
     return
