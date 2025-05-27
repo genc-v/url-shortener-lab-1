@@ -270,7 +270,6 @@
         </div>
       </div>
     </transition>
-    <NuxtLink to="/link/32">test</NuxtLink>
   </div>
 </template>
 
