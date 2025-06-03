@@ -13,7 +13,7 @@ export const api = async (
   }
 
   if (needsToken) {
-    const token = useCookie('byToken')
+    let token = useCookie('byToken')
     const exp = useCookie('exp')
 
     if (!token.value || !exp.value) {
@@ -27,7 +27,7 @@ export const api = async (
 
     const tokenExp = Number(exp.value) * 1000 < Date.now()
     if (tokenExp) {
-      await fetchToken()
+      token.value = await fetchToken()
     }
 
     const validToken = useCookie('byToken')
@@ -131,7 +131,7 @@ const fetchToken = async () => {
     })
     setExp.value = decoded.exp.toString()
 
-    return
+    return newTokens.token
   } catch (error) {
     console.error(error)
   }
