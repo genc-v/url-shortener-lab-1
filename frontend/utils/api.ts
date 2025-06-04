@@ -63,11 +63,13 @@ export const api = async (
 
     return await response.json()
   } catch (error: any) {
-    toast.add({
-      title: 'Error fetching data',
-      description: error.message,
-      color: 'red'
-    })
+    if (!process.server) {
+      toast.add({
+        title: 'Error fetching data',
+        description: error.message,
+        color: 'red'
+      })
+    }
     console.error(
       'Fetch error:',
       error instanceof Error ? error.message : 'Unknown error'
@@ -89,11 +91,13 @@ const fetchToken = async () => {
   })
 
   if (!token.value || !rt.value) {
-    toast.add({
-      title: 'Error fetching data',
-      description: 'Token not found',
-      color: 'red'
-    })
+    if (!process.server) {
+      toast.add({
+        title: 'Error fetching data',
+        description: 'Token not found',
+        color: 'red'
+      })
+    }
     console.error('Token not found')
     return
   }
