@@ -43,14 +43,13 @@ services:
           "localhost",
           "-u",
           "urlshort",
-          "-p alskjdfa@alskdjfAAAb12"
+          "-palskjdfa@alskdjfAAAb12"
         ]
       interval: 5s
       timeout: 10s
       retries: 10
       start_period: 60s
     restart: always
-    command: --default-authentication-plugin=mysql_native_password
 
 volumes:
   mysql-data:
