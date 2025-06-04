@@ -46,10 +46,10 @@ services:
           "-palskjdfa@alskdjfAAAb12"
         ]
       interval: 5s
-      timeout: 10s
-      retries: 10
-      start_period: 60s
+      timeout: 5s
+      retries: 5
     restart: always
+    command: --default-authentication-plugin=mysql_native_password
 
 volumes:
   mysql-data:
