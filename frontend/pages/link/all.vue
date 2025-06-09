@@ -439,12 +439,14 @@ const columns = [
 ]
 const SearchUrls = async () => {
   if (searchQuery.value) {
-    await api('search?UrlName=' + searchQuery.value, 'GET')
+    await api('search?UrlName=' + searchQuery.value + '&pageNumber=' + page.value + '&pageSize=' +pageSize.value, 'GET')
       .then((result) => {
-        data.value = result
+        data.value = result.urls
+        totalPages.value = result.totalPages
       })
       .catch(() => {
         data.value = []
+        totalPages.value = 1
         toast.add({
           title: 'Search failed',
           description: 'No results found for "' + searchQuery.value + '"',

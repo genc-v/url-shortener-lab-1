@@ -28,10 +28,8 @@ public class URLSearchController : ControllerBase
 
     [HttpGet]
     [Authorize]
-    public IActionResult SearchUrl(string UrlName)
+    public IActionResult SearchUrl(string UrlName, int pageNumber = 1, int pageSize = 10)
     {
-
-
         var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
         int userId = Authentication.GetUserIdFromToken(token);
         var searchQuery = UrlName.Trim().ToLower();
@@ -48,6 +46,9 @@ public class URLSearchController : ControllerBase
         if (admin)
         {
             var resultsAdmin = query.Where(url => url.OriginalUrl.ToLower().Contains(searchQuery) || url.ShortUrl.ToLower().Contains(searchQuery) || url.Description.ToLower().Contains(searchQuery))
+                .OrderByDescending(url => url.DateCreated)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToList()
                 .Select(url => new UrlResponseDto()
                 {
@@ -59,12 +60,17 @@ public class URLSearchController : ControllerBase
                 })
                 .ToList();
 
-            return Ok(resultsAdmin);
-
+            return Ok(new
+            {
+                Urls = resultsAdmin,
+                TotalPages = (int)Math.Ceiling((double)query.Count() / pageSize)
+            });
         }
 
-
         var results = query.Where(url => url.UserId == userId && (url.OriginalUrl.ToLower().Contains(searchQuery) || url.ShortUrl.ToLower().Contains(searchQuery) || url.Description.ToLower().Contains(searchQuery)))
+            .OrderByDescending(url => url.DateCreated)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToList()
             .Select(url => new UrlResponseDto()
             {
@@ -76,7 +82,10 @@ public class URLSearchController : ControllerBase
             })
             .ToList();
 
-        return Ok(results);
-
+        return Ok(new
+        {
+            Urls = results,
+            TotalPages = (int)Math.Ceiling((double)query.Count(url => url.UserId == userId) / pageSize)
+        });
     }
 }
