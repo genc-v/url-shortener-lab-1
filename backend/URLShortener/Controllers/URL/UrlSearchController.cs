@@ -45,12 +45,14 @@ public class URLSearchController : ControllerBase
 
         if (admin)
         {
-            var resultsAdmin = query.Where(url => url.OriginalUrl.ToLower().Contains(searchQuery) || url.ShortUrl.ToLower().Contains(searchQuery) || url.Description.ToLower().Contains(searchQuery))
+            var filteredAdminQuery = query.Where(url => url.OriginalUrl.ToLower().Contains(searchQuery) || url.ShortUrl.ToLower().Contains(searchQuery) || url.Description.ToLower().Contains(searchQuery));
+
+            var resultsAdmin = filteredAdminQuery
                 .OrderByDescending(url => url.DateCreated)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList()
-                .Select(url => new UrlResponseDto()
+                .Select(url => new UrlResponseDto
                 {
                     UserId = url.UserId,
                     OriginalUrl = url.OriginalUrl,
@@ -63,16 +65,18 @@ public class URLSearchController : ControllerBase
             return Ok(new
             {
                 Urls = resultsAdmin,
-                TotalPages = (int)Math.Ceiling((double)query.Count() / pageSize)
+                TotalPages = (int)Math.Ceiling((double)filteredAdminQuery.Count() / pageSize)
             });
         }
 
-        var results = query.Where(url => url.UserId == userId && (url.OriginalUrl.ToLower().Contains(searchQuery) || url.ShortUrl.ToLower().Contains(searchQuery) || url.Description.ToLower().Contains(searchQuery)))
+        var filteredUserQuery = query.Where(url => url.UserId == userId && (url.OriginalUrl.ToLower().Contains(searchQuery) || url.ShortUrl.ToLower().Contains(searchQuery) || url.Description.ToLower().Contains(searchQuery)));
+
+        var results = filteredUserQuery
             .OrderByDescending(url => url.DateCreated)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToList()
-            .Select(url => new UrlResponseDto()
+            .Select(url => new UrlResponseDto
             {
                 UserId = url.UserId,
                 OriginalUrl = url.OriginalUrl,
@@ -85,7 +89,7 @@ public class URLSearchController : ControllerBase
         return Ok(new
         {
             Urls = results,
-            TotalPages = (int)Math.Ceiling((double)query.Count(url => url.UserId == userId) / pageSize)
+            TotalPages = (int)Math.Ceiling((double)filteredUserQuery.Count() / pageSize)
         });
     }
 }

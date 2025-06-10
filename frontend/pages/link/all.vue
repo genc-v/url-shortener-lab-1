@@ -165,7 +165,6 @@
     </div>
 
     <div
-      v-if="!isSearching"
       class="flex items-center flex-wrap-reverse justify-center gap-5 md:justify-between mt-4"
     >
       <USelect v-model="value" :items="items" class="w-20" />
@@ -255,14 +254,19 @@ if (totalPages.value < (route.query.page || 1)) {
 
 watch(
   () => page.value,
-  (a) => {
+  async (a) => {
     window.scrollTo(0, 0)
     router.push({
       query: {
+        ...route.query,
         page: a
       }
     })
-    fetchUrls()
+    if (searchQuery.value) {
+      await SearchUrls()
+    } else {
+      await fetchUrls()
+    }
   }
 )
 watch(
@@ -471,7 +475,7 @@ watch(isDeleteModalOpen, (isOpen) => {
   else document.removeEventListener('keydown', handler)
 })
 
-const debouncedSearch = debounce(() => {
+const debouncedSearch = debounce(async () => {
   isSearching.value = true
   router.push({
     query: {
@@ -489,7 +493,7 @@ const debouncedSearch = debounce(() => {
     return
   }
   page.value = 1
-  SearchUrls()
+  await SearchUrls()
 }, 500)
 watch(searchQuery, debouncedSearch)
 useHead({
