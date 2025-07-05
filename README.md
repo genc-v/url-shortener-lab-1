@@ -151,3 +151,4 @@ If you prefer not to run the application locally, visit the live version here:
 ## License
 
 No license, just for fun.
+
